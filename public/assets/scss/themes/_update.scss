@@ -1,0 +1,428 @@
+@import "../utils/variables";
+// jsgrid css
+.jsgrid-filter-row {
+    select, input {
+        padding: 6px 10px;
+        border: 1px solid $horizontal-border-color;
+        background: $white;
+    }
+}
+
+// popover
+.popover {
+    background-color: $white;
+    border: none;
+    -webkit-box-shadow: 0 0 20px rgba($primary-color, 0.1);
+    box-shadow: 0 0 20px rgba($primary-color, 0.1);
+    .popover-header {
+        background-color: $theme-medium-color;
+        color: $primary-color;
+        border-bottom: none;
+    }
+    .popover-body {
+        color: rgba(43,43,43,0.7);
+    }
+}
+
+// tooltip css start
+.tooltip {
+    &.bs-tooltip-top {
+      .tooltip-arrow {
+          &:before {
+              border-top-color:$theme-medium-color;
+          }
+      }
+    }
+    &.bs-tooltip-bottom {
+        .tooltip-arrow {
+            &:before {
+                border-bottom-color: $theme-medium-color;
+                border-top-color: transparent;
+            }
+        }
+    }
+    &.bs-tooltip-start {
+        .tooltip-arrow {
+            &:before {
+                border-left-color: $theme-medium-color;
+                border-top-color: transparent;
+            }
+        }
+    }
+    &.bs-tooltip-end {
+        .tooltip-arrow {
+            &:before {
+                border-right-color: $theme-medium-color;
+                border-top-color: transparent;
+            }
+        }
+    }
+    .tooltip-inner {
+        background-color: $theme-medium-color;
+        color: $primary-color;
+    }
+    .tooltip-arrow {
+        &:before {
+            border-top-color: $theme-medium-color;
+        }
+    }
+}
+
+// tooltip css end
+
+// dropdown css start
+.dropdown-basic {
+    .dropdown {
+        .dropdown-content {
+            a {
+                padding: 6px 16px;
+                color: $dark-editor-document;
+                opacity: 0.6;
+                font-size: 13px;
+                border-top: 1px solid $light-semi-gray;
+                background: $white;
+                &:hover {
+                    background-color: $white;
+                }
+            }
+            .dropdown-header {
+                padding: 8px 16px;
+                font-weight: 400;
+                color: $dark-color;
+                font-size: 13px;
+            }
+        }
+    }
+    .dropup {
+        .dropup-content {
+            top: auto;
+        }
+    }
+}
+// dropdown css end
+// accordian css start
+.default-according {
+    .card {
+        .card-header {
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            &.bg-primary,&.bg-secondary {
+                .btn {
+                    border-color: $transparent-color;
+                }
+            }
+            i {
+                position: initial;
+                font-size: 20px;
+                display: inline-block;
+                vertical-align: text-bottom;
+                margin-right: 5px;
+            }
+            h5 {
+                margin-top: 0;
+            }
+            .btn-link {
+                padding: 12px 20px;
+                width: 100%;
+                text-align: left;
+                letter-spacing: 0.7px;
+                font-family: Roboto;
+                border: 1px solid $light-semi-gray;
+                border-radius: 0;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+            }
+        }
+        .card-body {
+            padding: 15px 20px;
+            line-height: 22px;
+            font-size: 13px;
+            border-color: $light-semi-gray;
+            border-radius: 0;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            color: $dark-color;
+        }
+    }
+} 
+// accordian css end
+
+// tab-bootstrap css start
+.nav-tabs {
+    border-bottom-color: $light-semi-gray;
+    .nav-bottom {
+        .nav-item {
+            .nav-link.active {
+                border-color: $light-semi-gray;
+            }
+        }
+    } 
+}
+.nav-tabs {
+    .nav-item{
+        &.show {
+            .nav-link {
+                font-weight: 500;
+            }
+        }
+    }
+    .nav-link {
+        color: $dark-color;
+        &.active {
+            font-weight: 500;
+        }
+    }
+    &.nav-bottom {
+        .nav-item {
+            .nav-link {
+                &.active {
+                    border-color: $light-gray $light-gray #fff;
+                }
+            }
+        }
+    }
+}
+.dropdown-menu {
+    -webkit-box-shadow: 0 0 20px rgba(89,102,122,0.1);
+    box-shadow: 0 0 20px rgba(89,102,122,0.1);
+    border: none;
+    padding: 0;
+    .dropdown-item {
+      color: #2b2b2b;
+      opacity: 0.6;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-top: 1px solid $light-semi-gray;
+      background: $white;
+      &:hover {
+        background-color: $white;
+      }
+    }
+    .dropdown-divider {
+        margin: 0;
+        border-top: 1px solid #cccccc;
+    }
+  }
+// tab-bootstrap css end
+
+.border-tab{
+    .nav-tabs {
+        .nav-item {
+            .nav-link {
+                &.active {
+                    border-bottom: 2px solid $primary-color;
+                }
+                &.show {
+                    border-bottom: 2px solid $primary-color;
+                }
+                &:focus {
+                    border-bottom: 2px solid $primary-color;
+                }
+            }
+        }
+    }
+}
+.tabbed-card {
+    .nav-tabs {
+        .nav-item {
+            .nav-link {
+                top: 17px;
+            }
+        }
+    }
+}
+.timeliny {
+    .timeliny-dot::before {
+        font-size: $btn-lg-font-size;
+    }
+}
+.form-builder-header-1,.form-builder-2-header {
+    background-color: #f7f6ff;
+    .nav-primary {
+        .nav-link {
+            color: $dark-color;
+            font-weight: 400;
+            &.active {
+                color: $white;
+            }
+        }
+    }
+    h6 {
+        margin-bottom: 0;
+        font-weight: 400;
+        line-height: 36px;
+    }
+}
+.component {
+    .input-group {
+        .btn {
+            line-height: 32px;
+            text-transform: capitalize;
+        }
+    }
+}
+.form-builder {
+    .drag-box {
+        fieldset {
+            margin-top: 0;
+        }
+    }
+}
+.login-card {
+    .login-main {
+        .theme-form {
+            label {
+                font-size: $body-font-size;
+            }
+            .show-hide {
+                top: 50%;
+            }
+        }
+    }
+}
+// faq css start
+.faq-accordion {
+    .card {
+        .btn-link {
+            svg {
+                margin-left: 20px;
+            }
+        }
+    }
+}
+// faq css end
+.job-filter {
+    .faq-form {
+        .form-control {
+            font-size: 14px;
+        }
+        .search-icon {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}
+.accordion-button {
+    &:focus {
+        box-shadow: none;
+    }
+}
+#bar-chart-earning {
+    .apexcharts-canvas {
+        .apexcharts-legend  {
+            bottom: -2px !important;
+        }
+    }
+}
+.dzu-dropzone {
+    background-color: $inner-bg;
+    border: 2px dashed #ced4da;
+    overflow: unset;
+    .dzu-inputLabel {
+        color: $theme-font-color;
+    }
+}
+.rbt-token {
+    background-color: var(--theme-deafult);
+    color: $white;
+    font-size: 14px;
+    border-radius: 0;
+}
+.rbt-input-multi {
+    background-color: $inner-bg;
+    border: 1px solid $light-semi-gray;
+    display: block;
+    padding: 13px 10px;
+    vertical-align: middle;
+    border-radius: 4px;
+    max-width: 100%;
+    line-height: 22px;
+    cursor: text;
+}
+.custom-map {
+    svg {
+        fill: var(--theme-deafult);
+        height: 390px;
+        width: 100%;
+    }
+}
+.btn-theme {
+    &:hover {
+        background-color: var(--theme-deafult);
+        color: $white;
+    }
+}
+.input-group {
+    .react-datepicker-wrapper {
+        min-width: 100%;
+    }
+    .input-group-text {
+        position: absolute;
+        right: 0;
+        height: 100%;
+    }
+}
+.input-group {
+    .rc-time-picker {
+        width: 100%;
+        .rc-time-picker-input {
+            padding: 24px 20px;
+        }
+        .rc-time-picker-clear {
+            top: 11px;
+            right: 10px;
+            .rc-time-picker-clear-icon {
+                &:after {
+                    font-size: 23px;
+                }
+            }
+        }
+    }
+}
+.react-datepicker-popper {
+    .react-datepicker {
+        .react-datepicker__triangle {
+            left: -19px !important;
+        }
+        .react-datepicker__navigation-icon {
+            width: 25px;
+            height: 25px;
+            border-radius: 5px;
+            user-select: none;
+            background: var(--theme-deafult);
+            right: -2px;
+            &::before {
+                right: 8px;
+                top: 8px;
+                border-width: 2px 2px 0 0;
+                width: 7px;
+                height: 7px;
+                border-color: $white;
+            }
+        }
+        .react-datepicker__navigation-icon--next{
+            &::before {
+                left: 6px;
+            }
+        }
+        .react-datepicker__month-container {
+            .react-datepicker__current-month {
+                color: var(--theme-deafult);
+            }
+        }
+        .day--selected {
+            &:hover {
+                background-color: var(--theme-deafult);
+            }
+        }
+    }
+}
+.theme-form{
+    .dropzone-container{
+        background: unset;
+        background-color: rgba($primary-color, 0.05);
+    }
+}

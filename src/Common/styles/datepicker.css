@@ -1,0 +1,23 @@
+/* Custom input field */
+.custom-datepicker input {
+  width: 220px;
+  padding: 10px 14px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+  z-index: 10;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus effect */
+.custom-datepicker input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Placeholder text */
+.custom-datepicker input::placeholder {
+  color: #aaa;
+  font-style: italic;
+}

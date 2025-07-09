@@ -1,0 +1,66 @@
+/* Events - already green, just in case */
+.fc-event.price-event {
+  background-color: #198754 !important;
+  border: none !important;
+  color: white !important;
+  font-size: 0.75rem;
+  text-align: center;
+  opacity: 0.7; /* Default opacity for events */
+  transition: opacity 0.3s ease; /* Smooth transition */
+}
+
+/* Prev/Next buttons */
+.fc .fc-button {
+  background-color: #198754 !important;
+  color: white !important;
+  border: none;
+  font-weight: bold;
+}
+
+.fc .fc-button:hover {
+  background-color: darkgreen !important;
+}
+
+/* Weekday labels (Sun, Mon...) */
+.fc .fc-col-header-cell-cushion {
+  color: #198754 !important;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Day numbers (1, 2, 3...) */
+.fc .fc-daygrid-day-number {
+  color: #198754 !important;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Highlight for today's cell */
+.fc-day-today {
+  background-color: #e1ffe1 !important;
+  border: 2px solid #198754 !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  color: #198754 !important;
+  font-weight: bold;
+}
+
+.fc-day {
+  cursor: pointer; /* Changes cursor to a hand when hovering over the entire day cell (including the day number and any events) */
+}
+
+.fc-event {
+  pointer-events: auto; /* Allow click events */
+}
+
+.fc-day:hover {
+  background-color: #e1ffe1 !important; /* Light green background on hover */
+}
+
+/* Hover effect for events when hovering over a day cell */
+.fc-day:hover .fc-event {
+  opacity: 1 !important; /* Make events fully visible when hovering over the day cell */
+  background-color: #28a745 !important; /* Highlight event color */
+  border: 1px solid #198754; /* Optionally, add a border to events */
+}
