@@ -34,6 +34,8 @@ export interface BookingType {
     infantCount: number;
     bookingDate: string;
     startTime: string;
+    promoCode: string;
+    promoPercent: number;
     otherTravellers: {
       firstname: string;
       lastname: string;

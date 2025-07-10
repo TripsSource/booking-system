@@ -2,13 +2,11 @@ import { BOOKINGSTEPS } from "@/constants/data";
 import React, { Dispatch, SetStateAction } from "react";
 
 function TopSteps({
-  currentStep,
-  maxStepReached,
-  setCurrentStep,
+  step,
+  setStep,
 }: {
-  currentStep: number;
-  maxStepReached: number;
-  setCurrentStep: Dispatch<SetStateAction<number>>;
+  step: { current: number; max: number };
+  setStep: Dispatch<SetStateAction<{ current: number; max: number }>>;
 }) {
   return (
     <div className="step-stepContainer">
@@ -17,29 +15,29 @@ function TopSteps({
           {index !== 0 && (
             <div
               className={`step-line ${
-                index <= currentStep ? "step-activeLine" : ""
+                index <= step.current ? "step-activeLine" : ""
               }`}
             />
           )}
           <div
             className={`step-circle ${
-              index < currentStep
+              index < step.current
                 ? "step-completed"
-                : index === currentStep
+                : index === step.current
                 ? "step-active"
                 : ""
             }`}
             onClick={() => {
-              if (index < maxStepReached + 1) {
-                setCurrentStep(index);
+              if (index < step.max + 1) {
+                setStep((pre) => ({ ...pre, current: index }));
               }
             }}
             style={{ cursor: "pointer" }}
           >
-            {index === currentStep ? (
+            {index === step.current ? (
               <span>&#8658;</span>
             ) : (
-              index < currentStep && <span>&#10003;</span>
+              index < step.current && <span>&#10003;</span>
             )}
           </div>
           <div className="step-label">{label}</div>

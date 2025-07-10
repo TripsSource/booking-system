@@ -26,6 +26,7 @@ import { BookingType } from "@/types/store/booking";
 import { TravellerState } from "@/types/app/booking";
 import { ProductDetailState } from "@/types/app/product";
 import { getMarginAction } from "@/store/financial";
+import { validPromoAction } from "@/store/promo";
 
 export const useAllStatusBooking = (id: string, type: string) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,8 +46,11 @@ export const useAllStatusBooking = (id: string, type: string) => {
   });
   const [checkout, setCheckout] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string>("");
-  const [currentStep, setCurrentStep] = useState<number>(-1);
-  const [maxStepReached, setMaxStepReached] = useState<number>(0);
+  const [step, setStep] = useState<{ current: number; max: number }>({
+    current: -1,
+    max: 0,
+  });
+  const [promo, setPromo] = useState("");
   const [err, setErr] = useState<string>("");
 
   const fetchInitialData = async (id: string) => {
@@ -97,11 +101,12 @@ export const useAllStatusBooking = (id: string, type: string) => {
   }, [id]);
 
   useEffect(() => {
-    if (currentStep > maxStepReached) setMaxStepReached(currentStep);
-  }, [currentStep, maxStepReached]);
+    if (step.current > step.max)
+      setStep((pre) => ({ ...pre, max: step.current }));
+  }, [step]);
 
   const onStepClick = (index: number) => {
-    setCurrentStep(index);
+    setStep((pre) => ({ ...pre, current: index }));
     if (index === 0) {
       const adult = Number(booking.bookingDetails.adultCount);
       const child = Number(booking.bookingDetails.childCount);
@@ -110,6 +115,23 @@ export const useAllStatusBooking = (id: string, type: string) => {
       );
       handleBookingDetails("otherTravellers", otherTravellers);
     }
+  };
+
+  const applyPromo = async () => {
+    const { payload } = await dispatch(validPromoAction(promo));
+    if (payload?.["data"]) {
+      toast.success(`${payload.message}`);
+      setBooking((pre) => ({
+        ...pre,
+        bookingDetails: {
+          ...pre.bookingDetails,
+          promoCode: payload.data._id,
+          promoPercent: payload.data.percent,
+        },
+      }));
+      setPromo("");
+    } else toast.error(`${payload.error}`);
+    console.log(payload);
   };
 
   const handleBookingDetails = (
@@ -188,7 +210,7 @@ export const useAllStatusBooking = (id: string, type: string) => {
   };
 
   const isButtonDisabled = () => {
-    const processStep = currentStep;
+    const processStep = step.current;
     switch (processStep) {
       case 0:
         const { firstname, lastname, phoneNumber, lang, email, birthDate } =
@@ -260,13 +282,13 @@ export const useAllStatusBooking = (id: string, type: string) => {
       toast.error("Invalid email");
       return;
     }
-    if (currentStep < BOOKINGSTEPS.length) {
-      setCurrentStep((prev) => prev + 1);
+    if (step.current < BOOKINGSTEPS.length) {
+      setStep((prev) => ({ ...prev, current: prev.current + 1 }));
     }
-    if (currentStep === BOOKINGSTEPS.length - 2) {
+    if (step.current === BOOKINGSTEPS.length - 2) {
       setCheckout(true);
     }
-    if (currentStep === BOOKINGSTEPS.length - 1) {
+    if (step.current === BOOKINGSTEPS.length - 1) {
       setClientSecret("");
       if (err === "" || err === undefined) {
         const data: BookingType = {
@@ -279,13 +301,13 @@ export const useAllStatusBooking = (id: string, type: string) => {
         );
         if (payload?.["error"]) {
           toast.error(payload.error);
-          setCurrentStep(currentStep - 1);
+          setStep((prev) => ({ ...prev, current: prev.current - 1 }));
         } else if (
           payload?.["message"] &&
           payload.message === "Network Error"
         ) {
           toast.error(payload.message);
-          setCurrentStep(2);
+          setStep((prev) => ({ ...prev, current: 2 }));
         } else if (payload?.["clientSecret"])
           setClientSecret(payload.clientSecret);
         else if (payload?.["message"]) {
@@ -307,9 +329,10 @@ export const useAllStatusBooking = (id: string, type: string) => {
     booking,
     checkout,
     clientSecret,
-    currentStep,
-    maxStepReached,
-    setCurrentStep,
+    step,
+    promo,
+    setStep,
+    setPromo,
     onStepClick,
     handleBookingDetails,
     handleBookingMintraveler,
@@ -318,5 +341,6 @@ export const useAllStatusBooking = (id: string, type: string) => {
     handleCheckout,
     isButtonDisabled,
     handleStepAdvance,
+    applyPromo,
   };
 };

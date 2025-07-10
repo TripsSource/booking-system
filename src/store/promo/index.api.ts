@@ -15,3 +15,7 @@ export const getAllPromo = async (data: getPromoState) => {
 export const deletePromo = async (id: string) => {
   return await api.delete(`/api/promo/${id}`).then((res) => res.data);
 };
+
+export const validPromo = async (code: string) => {
+  return await api.post("/api/promo/code", { code }).then((res) => res.data);
+};

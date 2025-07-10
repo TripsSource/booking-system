@@ -17,6 +17,8 @@ export const initalBooking: BookingType = {
       mobilityQuestion: "",
       medicalQuestion: "",
     },
+    promoCode: "",
+    promoPercent: 0,
     productId: "",
     startingLocationId: "",
     meetingLocation: "",
