@@ -5,9 +5,6 @@ import moment from "moment";
 import { ProductDetailState } from "@/types/app/product";
 import { BookingType } from "@/types/store/booking";
 import { useSelector } from "react-redux";
-import { selectedAgent } from "@/store/travelAgent";
-import { userState } from "@/store/auth";
-import { marginState } from "@/store/financial";
 import LoadingAuthButton from "@/Common/LoadingAuthButton";
 import UseBotCheck from "@/hooks/UseBotCheck";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -38,7 +35,6 @@ const GiftCard = ({
 }) => {
   if (!product) return null;
   const loading = useSelector(PromoLoadingState);
-  const [botCaptcha, setRecaptchaToken, setBotCaptcha] = UseBotCheck();
   const { name } = product;
   const { adultCount, childCount, bookingDate, promoPercent } =
     booking.bookingDetails;
@@ -114,19 +110,12 @@ const GiftCard = ({
                 classes: "btn btn-primary ms-3 border rounded-3",
                 types: "button",
                 loading,
-                disabled: loading || promoPercent > 0 || botCaptcha,
+                disabled: loading || promoPercent > 0,
                 title: "Apply",
                 onFunc: applyPromo,
               }}
             />
           </div>
-          <ReCAPTCHA
-            sitekey="6Lf-6WkrAAAAAMr1-cDSrTWvIuPFmwYhFdeykZmq"
-            onChange={(e) => setRecaptchaToken(e)}
-            onExpired={() => {
-              setBotCaptcha(true);
-            }}
-          />
         </div>
       </div>
       <div className="d-flex flex-column border-bottom py-3">

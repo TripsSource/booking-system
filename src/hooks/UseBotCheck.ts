@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 function UseBotCheck() {
   const dispatch = useDispatch<AppDispatch>();
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const [botCaptcha, setBotCaptcha] = useState<boolean>(true);
+  const [botCaptcha, setBotCaptcha] = useState<boolean>(false);
   const botCheck = async () => {
     if (recaptchaToken && recaptchaToken.length > 0) {
       const { payload } = await dispatch(accountBotCheckAction(recaptchaToken));

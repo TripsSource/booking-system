@@ -151,7 +151,7 @@ function StripeCheckout({
               <div className="pricing-container">
                 <div className="pricing-header">
                   <h6 style={{ color: "grey" }}>{name}</h6>
-                  <h3 className="price">CHF {decimalTwoPlace(totalPrice)}</h3>
+                  <h3 className="price">CHF {totalPrice.toFixed(2)}</h3>
                 </div>
 
                 <div className="pricing-details">
@@ -165,8 +165,8 @@ function StripeCheckout({
                       <span style={{ flex: "1 1 auto" }}></span>
                       <span style={{ fontWeight: "bold" }}>
                         CHF{" "}
-                        {decimalTwoPlace(
-                          adultPrice * (1 - promoPercent - totalFee)
+                        {(adultPrice * (1 - promoPercent - totalFee)).toFixed(
+                          2
                         )}
                       </span>
                     </div>
@@ -181,8 +181,8 @@ function StripeCheckout({
                       <span style={{ flex: "1 1 auto" }}></span>
                       <span style={{ fontWeight: "bold" }}>
                         CHF{" "}
-                        {decimalTwoPlace(
-                          childPrice * (1 - promoPercent - totalFee)
+                        {(childPrice * (1 - promoPercent - totalFee)).toFixed(
+                          2
                         )}
                       </span>
                     </div>

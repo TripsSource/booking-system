@@ -26,7 +26,9 @@ function OtaProducts({
   order: string;
   handleSortOrder: (value: string) => void;
 }) {
-  const mProducts = useMemo(() => products, [products]);
+  const mProducts = useMemo(() => products, [products]).filter(
+    (product) => product.liveStatus
+  );
   const mSelectedProduct = useMemo(() => selectedProduct, [selectedProduct]);
   const {
     _id,

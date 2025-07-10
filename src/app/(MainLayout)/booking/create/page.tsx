@@ -34,7 +34,9 @@ const Tours = () => {
     if (products.length < 2 || !Array.isArray(products)) getProducts();
   }, []);
   const productLoading = useSelector(productLoadingState);
-  const products: readProductState[] = useSelector(productsState);
+  const products: readProductState[] = useSelector(productsState).filter(
+    (product) => product.liveStatus
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [data, setData] = useState({} as ProductDetailState);
   const toggleModal = () => setModalOpen(!modalOpen);
