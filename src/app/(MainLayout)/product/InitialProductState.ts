@@ -1,8 +1,11 @@
-import { ProductCostState, ProductDetailState } from "@/types/app/product";
+import {
+  ProductDetailState,
+  ProductTourState,
+  ProductRevenueState,
+} from "@/types/app/product";
 import moment from "moment";
 
-export const initialCost: ProductCostState = {
-  startingLocationId: "",
+export const initialRevenue: ProductRevenueState = {
   clientTrainTicket: "",
   swissHalfFareTravelPass: "",
   mountainTicket1: "",
@@ -16,29 +19,41 @@ export const initialCost: ProductCostState = {
   childrenCost: "",
 };
 
+export const initialTour: ProductTourState = {
+  destinationId: "",
+  meetingLocation: null,
+  isPrivate: false,
+  withDriver: true,
+  members: "15",
+  times: [""],
+  duration: "",
+  revenue: initialRevenue,
+  guideDetails: [{ position: "", pointsToCover: "" }],
+  suppliers: [{ time: "", supplierId: null }],
+};
+
 export const initialProduct: ProductDetailState = {
+  destinationId: "",
+  tours: [initialTour],
   name: "",
   description: "",
-  destination: "",
-  isPrivate: false,
-  members: "15",
-  withDriver: true,
-  startingLocations: [{ _id: "", meetingLocation: "", durationHours: "" }],
-  onlineMap: {
-    usaPosition: [46.8, 8.23],
-    locations: [],
-  },
-  timeSlots: {
-    startDate: moment(Date.now()).format("YYYY-MM-DD"),
-    endDate: moment(Date.now()).format("YYYY-MM-DD"),
-    blackOuts: [],
-    times: [],
-  },
-  exclusions: [""],
+  shortDescription: "",
+  startDate: moment(Date.now()).format("YYYY-MM-DD"),
+  endDate: null,
+  blackOuts: [
+    {
+      startDate: moment(Date.now()).format("YYYY-MM-DD"),
+      endDate: moment(Date.now()).format("YYYY-MM-DD"),
+    },
+  ],
   inclusions: [""],
-  images: [],
+  exclusions: [""],
+  onlineMap: { usaPosition: [46.8, 8.23], locations: [] },
   bring: "",
-  knowBeforeGo: "",
+  knowBefore: "",
+  images: [],
+  isActive: true,
+  otaLive: [{ otaName: "", status: false }],
   bookingDetails: {
     leadFullName: true,
     leadBirth: true,
@@ -50,20 +65,4 @@ export const initialProduct: ProductDetailState = {
     mobilityQuestion: true,
     medicalQuestion: true,
   },
-  revenues: [initialCost],
-  liveStatus: true,
-  guideDetails: [
-    {
-      startingLocationId: "",
-      itineraryStops: [
-        {
-          position: "",
-          pointsToCover: "",
-        },
-      ],
-    },
-  ],
-  suppliers: [
-    { startingLocationId: "", contacts: [{ supplierId: "", timeSlot: "" }] },
-  ],
 };

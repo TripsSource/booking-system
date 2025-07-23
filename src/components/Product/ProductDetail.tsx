@@ -22,19 +22,17 @@ const WorldMap = dynamic(() => import("@/components/Dashboard/WorldMap"), {
 const ProductDetail = ({
   product,
   handleProduct,
-  handleLocations,
-  addLocations,
-  removeLocations,
+  handleTours,
+  addTour,
+  removeTour,
 }: ProductDetailProps) => {
   const {
     name,
     description,
-    isPrivate,
-    members,
-    startingLocations,
     onlineMap,
-    destination,
-    withDriver,
+    destinationId,
+    shortDescription,
+    tours,
   } = product;
   const destinations = useSelector(destinationTitlesState) || [];
   const [checkPlace, setCheckPlace] = useState(false);
@@ -56,10 +54,8 @@ const ProductDetail = ({
           <label className="form-label-title">Destination</label>
           <select
             className="form-control js-example-basic-single col-sm-12"
-            value={
-              typeof destination === "string" ? destination : destination?._id
-            }
-            onChange={(e) => handleProduct("destination", e.target.value)}
+            value={destinationId}
+            onChange={(e) => handleProduct("destinationId", e.target.value)}
           >
             {destinations.length > 0 ? (
               destinations.map((value: readDestinationTitleType) => (
@@ -72,6 +68,18 @@ const ProductDetail = ({
             )}
           </select>
         </div>
+        <div className="mb-1">
+          <label className="form-label-title">Short Description</label>
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Briefly describe this tour—keep it to around 100 characters."
+            value={shortDescription}
+            onChange={(e) =>
+              handleProduct("shortDescription", e.target.value.slice(0, 100))
+            }
+          />
+        </div>
         <div className="mb-3">
           <label className="form-label-title">Description</label>
           <textarea
@@ -81,144 +89,209 @@ const ProductDetail = ({
             onChange={(e) => handleProduct("description", e.target.value)}
           />
         </div>
-        <div className="mb-3">
-          <div className="d-flex justify-content-start">
-            <div className="d-flex justify-content-start align-items-center ">
-              <div className="form-check form-switch">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={isPrivate}
-                  onChange={(e) => handleProduct("isPrivate", e.target.checked)}
-                  id="isPrivate"
-                />
-                <label className="form-check-label" htmlFor="isPrivate">
-                  {isPrivate ? PRIVATE_TOUR : SMALLGROUP_TOUR}
-                </label>
-              </div>
-            </div>
-            <div className="d-flex justify-content-start align-items-center ps-3">
-              <div className="form-check form-switch">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  checked={withDriver}
-                  onChange={(e) =>
-                    handleProduct("withDriver", e.target.checked)
-                  }
-                  id="isDriver"
-                />
-                <label className="form-check-label" htmlFor="isDriver">
-                  Driver
-                </label>
-              </div>
-            </div>
-            <div className="d-flex justify-content-start align-items-center ps-5 w-50">
-              <label className="form-label-title">Members</label>
-              <input
-                type="number"
-                min={PRIVATE_TOUR_MIN}
-                value={members}
-                onChange={(e) => {
-                  let members = Number(e.target.value);
-                  if (isPrivate) {
-                    members =
-                      members > PRIVATE_TOUR_MIN
-                        ? Math.min(members, PRIVATE_TOUR_MAX)
-                        : PRIVATE_TOUR_MIN;
-                  } else {
-                    members = Math.max(members, SMALLGROUP_TOUR_MIN);
-                  }
-                  handleProduct("members", members.toString());
-                }}
-                placeholder={`${
-                  isPrivate
-                    ? "Input a number between " +
-                      PRIVATE_TOUR_MIN +
-                      " and " +
-                      PRIVATE_TOUR_MAX
-                    : "Input a number more than " + SMALLGROUP_TOUR_MIN
-                }`}
-                className="form-control mb-1 ms-2"
-              />
-            </div>
-          </div>
-        </div>
         <div className="mb-1">
-          {startingLocations.map((location, index) => (
-            <div className="row g-3 mb-3 d-flex align-items-end" key={index}>
-              <div className="col-sm-3">
-                {index === 0 && (
-                  <label className="form-label-title">Start Locations</label>
-                )}
-                <select
-                  className="form-control js-example-basic-single col-sm-12"
-                  value={location._id}
-                  onChange={(e) =>
-                    handleLocations(index, "_id", e.target.value)
-                  }
-                >
-                  {destinations.length > 0 ? (
-                    destinations.map((value: readDestinationTitleType) => (
-                      <option key={value._id} value={value._id}>
-                        {value.destinationTitle}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>No destinations available</option>
-                  )}
-                </select>
+          {tours.map((tour, index) => (
+            <div
+              className="row g-3 d-flex align-items-center border-1 border rounded-3 mx-1 m-3 p-3"
+              key={index}
+            >
+              <div className="col-sm-11">
+                <div className="row">
+                  <div className="d-flex justify-content-start align-items-center">
+                    <h3>Tour {index + 1}</h3>
+                    <div className="ms-3">
+                      <label className="form-label-title mx-3">
+                        <input
+                          type="checkbox"
+                          className="form-check-input me-2"
+                          checked={tour.isPrivate}
+                          onChange={(e) =>
+                            handleTours(index, "isPrivate", e.target.checked)
+                          }
+                        />
+                        Private Tour
+                      </label>
+                    </div>
+                    <div>
+                      <label className="form-label-title mx-3">
+                        <input
+                          type="checkbox"
+                          className="form-check-input me-2"
+                          checked={tour.withDriver}
+                          onChange={(e) =>
+                            handleTours(index, "withDriver", e.target.checked)
+                          }
+                        />
+                        Driver
+                      </label>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-sm-2">
+                      <label className="form-label-title">Start Location</label>
+                      <select
+                        className="form-control js-example-basic-single col-sm-12"
+                        value={tour.destinationId}
+                        onChange={(e) =>
+                          handleTours(index, "destinationId", e.target.value)
+                        }
+                      >
+                        {destinations.length > 0 ? (
+                          destinations.map(
+                            (value: readDestinationTitleType) => (
+                              <option key={value._id} value={value._id}>
+                                {value.destinationTitle}
+                              </option>
+                            )
+                          )
+                        ) : (
+                          <option disabled>No destinations available</option>
+                        )}
+                      </select>
+                    </div>
+                    <div className="col-sm-5">
+                      <label className="form-label-title">
+                        Meeting Location
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter a meeting location"
+                        className="form-control"
+                        value={
+                          tour.isPrivate
+                            ? "Provided by customer"
+                            : tour.meetingLocation ?? ""
+                        }
+                        onChange={(e) =>
+                          handleTours(index, "meetingLocation", e.target.value)
+                        }
+                        disabled={tour.isPrivate}
+                      />
+                    </div>
+                    <div className="col-sm-3">
+                      <label className="form-label-title">
+                        Duration (Hours)
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="Enter hours"
+                        className="form-control"
+                        value={tour.duration}
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          if (Number(value) < 1) value = "1";
+                          handleTours(
+                            index,
+                            "duration",
+                            `${Math.max(1, Math.min(23, Number(value)))}`
+                          );
+                        }}
+                        min={1}
+                      />
+                    </div>
+                    <div className="col-sm-2">
+                      <label className="form-label-title">Members</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={tour.members}
+                        onChange={(e) => {
+                          let members = Number(e.target.value);
+                          if (tour.isPrivate) {
+                            members =
+                              members > PRIVATE_TOUR_MIN
+                                ? Math.min(members, PRIVATE_TOUR_MAX)
+                                : PRIVATE_TOUR_MIN;
+                          } else {
+                            members = Math.max(members, SMALLGROUP_TOUR_MIN);
+                          }
+                          handleTours(index, "members", members.toString());
+                        }}
+                        min={1}
+                        placeholder={`${
+                          tour.isPrivate
+                            ? "Input a number between " +
+                              PRIVATE_TOUR_MIN +
+                              " and " +
+                              PRIVATE_TOUR_MAX
+                            : "Input a number more than " + SMALLGROUP_TOUR_MIN
+                        }`}
+                      />
+                    </div>
+                    <label className="form-label-title mt-2">Times</label>
+                    <div className="row mx-1">
+                      {tour.times &&
+                        tour.times.map((time, i) => (
+                          <div
+                            className="col-sm-2 d-flex align-items-center justify-content-start g-1"
+                            key={i}
+                          >
+                            <select
+                              onChange={(e) => {
+                                const times = tour.times.map((tim, id) => {
+                                  if (i === id) return e.target.value;
+                                  else return tim;
+                                });
+                                handleTours(index, "times", times);
+                              }}
+                              value={time}
+                            >
+                              {Array.from(
+                                { length: (24 * 60) / 15 },
+                                (_, idex) => {
+                                  const totalMinutes = idex * 15;
+                                  const hours = Math.floor(totalMinutes / 60);
+                                  const minutes = totalMinutes % 60;
+                                  return (
+                                    <option
+                                      key={idex}
+                                      value={`${String(hours).padStart(
+                                        2,
+                                        "0"
+                                      )}:${String(minutes).padStart(2, "0")}`}
+                                    >
+                                      {String(hours).padStart(2, "0")}:
+                                      {String(minutes).padStart(2, "0")}
+                                    </option>
+                                  );
+                                }
+                              )}
+                            </select>
+                            <button
+                              className="bg-transparent border-0"
+                              type="button"
+                              onClick={() => {
+                                const times: string[] = tour.times.filter(
+                                  (_, ind) => ind !== i
+                                );
+                                handleTours(index, "times", times);
+                              }}
+                            >
+                              <Trash2 color={"#dc3545"} size={20} />
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                    <button
+                      className="col-sm-2 btn btn-outline-primary btn-block mx-3 mt-3"
+                      type="button"
+                      onClick={() => {
+                        handleTours(index, "times", [
+                          ...(Array.isArray(tour.times) ? tour.times : []),
+                          "",
+                        ]);
+                      }}
+                    >
+                      Add Time
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="col-sm-5">
-                {index === 0 && (
-                  <label className="form-label-title">Meeting Locations</label>
-                )}
-                <input
-                  type="text"
-                  placeholder="Enter a meeting location"
-                  className="form-control"
-                  value={
-                    isPrivate
-                      ? "Provided by customer"
-                      : location.meetingLocation
-                  }
-                  onChange={(e) =>
-                    handleLocations(index, "meetingLocation", e.target.value)
-                  }
-                  readOnly={isPrivate}
-                />
-              </div>
-              <div className="col-sm-3">
-                {index === 0 && (
-                  <label className="form-label-title">Duration (Hours)</label>
-                )}
-                <input
-                  type="number"
-                  placeholder="Enter a duration hours"
-                  className="form-control"
-                  value={
-                    isPrivate ? "Provided by customer" : location.durationHours
-                  }
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    if (Number(e.target.value) < 1) value = "1";
-                    handleLocations(
-                      index,
-                      "durationHours",
-                      `${Math.max(1, Math.min(24, Number(e.target.value)))}`
-                    );
-                  }}
-                  min={1}
-                  readOnly={isPrivate}
-                />
-              </div>
-              <div className="col-sm-1 mb-2">
+              <div className="col-sm-1 d-flex justify-content-center">
                 <button
                   className="bg-transparent border-0"
                   type="button"
-                  onClick={() => removeLocations(index)}
+                  onClick={() => removeTour(index)}
                 >
                   <Trash2 color={"#dc3545"} size={20} />
                 </button>
@@ -226,11 +299,12 @@ const ProductDetail = ({
             </div>
           ))}
           <button
-            className="btn btn-primary btn-block w-10"
+            className="btn btn-primary btn-block w-10 mt-3"
             type="button"
-            onClick={() => addLocations()}
+            disabled={destinations.length * 4 <= tours.length}
+            onClick={() => addTour()}
           >
-            Add Locations
+            Add Tour
           </button>
         </div>
       </div>

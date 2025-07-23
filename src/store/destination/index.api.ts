@@ -10,7 +10,8 @@ export const DeleteDestination = async (id: string) => {
 export const CreateDestination = async (data: DestinationDetailState) => {
   const formData = new FormData();
   formData.append("destinationTitle", data.destinationTitle);
-  formData.append("generalDescription", data.generalDescription);
+  formData.append("description", data.description);
+  formData.append("shortDescription", data.shortDescription);
   data.images.forEach((image: File) => {
     formData.append("images", image);
   });
@@ -20,7 +21,8 @@ export const CreateDestination = async (data: DestinationDetailState) => {
 export const UpdateDestination = async (data: DestinationDetailState) => {
   const formData = new FormData();
   formData.append("destinationTitle", data.destinationTitle);
-  formData.append("generalDescription", data.generalDescription);
+  formData.append("description", data.description);
+  formData.append("shortDescription", data.shortDescription);
   formData.append("deletedImages", JSON.stringify(data.deletedImages));
   data.images.forEach((image: File) => {
     formData.append("images", image);
@@ -31,9 +33,7 @@ export const UpdateDestination = async (data: DestinationDetailState) => {
 };
 
 export const GetDestinations = async () => {
-  return await api
-    .get<Response<readDestinationType[]>>(`/api/destinations`)
-    .then((res) => res.data);
+  return await api.get(`/api/destinations`).then((res) => res.data);
 };
 
 export const GetDestinationId = async (id: string) => {

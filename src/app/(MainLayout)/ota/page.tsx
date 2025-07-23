@@ -36,7 +36,6 @@ const page = () => {
   );
   const productLoading = useSelector(productLoadingState);
   const bookingLoading = useSelector(bookingsLoadingState);
-
   const checkProduct = selectedPanel === "Products";
 
   const [products, setProducts] = useState({
@@ -112,7 +111,12 @@ const page = () => {
   const fetchData = async () => {
     if (selectedPanel === "Products") {
       const { payload } = await dispatch(
-        getProductsAction({ page: productPage, perPage: productPerPage })
+        getProductsAction({
+          page: productPage,
+          perPage: productPerPage,
+          sort: productSort,
+          order: productOrder,
+        })
       );
       if (payload?.["data"]) setProducts((pre) => ({ ...pre, ...payload }));
     } else if (selectedPanel === "Bookings") {
@@ -132,8 +136,9 @@ const page = () => {
 
   const getProduct = async (id: string) => {
     const { payload } = await dispatch(getProductIdAction(id));
-    if (!payload?.["error"]) {
-      setSelectedProduct(payload);
+    console.log(payload);
+    if (payload?.["data"]) {
+      setSelectedProduct(payload.data);
     } else console.log(payload);
   };
 

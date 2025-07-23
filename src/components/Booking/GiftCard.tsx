@@ -36,8 +36,7 @@ const GiftCard = ({
   if (!product) return null;
   const loading = useSelector(PromoLoadingState);
   const { name } = product;
-  const { adultCount, childCount, bookingDate, promoPercent } =
-    booking.bookingDetails;
+  const { adultCount, childCount, bookingDate, promoPercent } = booking;
   const {
     totalPrice,
     bookingPrice,
@@ -47,9 +46,8 @@ const GiftCard = ({
     travelFee,
     travelPercent,
   } = price;
-
   const [active, setActive] = useState(false);
-
+  const convertTwoDecimal = (value: number) => Math.round(value * 100) / 100;
   return (
     <form className="theme-form mega-form border p-3">
       <div className="d-flex justify-content-between align-items-start">
@@ -58,7 +56,7 @@ const GiftCard = ({
           <label>{moment(bookingDate).format("ddd D MMMM YYYY")}</label>
         </div>
         <div className="text-nowrap mt-1">
-          <label>CHF {totalPrice.toFixed(2)}</label>
+          <label>CHF {convertTwoDecimal(totalPrice)}</label>
         </div>
       </div>
       <div className="d-flex flex-column border-bottom pb-3">
@@ -68,7 +66,7 @@ const GiftCard = ({
               <div className="d-flex justify-content-between align-items-center">
                 <div className="form-label-title">Adult</div>
                 <div className="form-label-title">
-                  CHF {(adultPrice * (1 - promoPercent)).toFixed(2)}
+                  CHF {convertTwoDecimal(adultPrice * (1 - promoPercent))}
                 </div>
               </div>
             )}
@@ -76,7 +74,7 @@ const GiftCard = ({
               <div className="d-flex justify-content-between align-items-center">
                 <div className="form-label-title">Child</div>
                 <div className="form-label-title">
-                  CHF {(childPrice * (1 - promoPercent)).toFixed(2)}
+                  CHF {convertTwoDecimal(childPrice * (1 - promoPercent))}
                 </div>
               </div>
             )}
@@ -121,16 +119,20 @@ const GiftCard = ({
       <div className="d-flex flex-column border-bottom py-3">
         <div className="d-flex justify-content-between align-items-center">
           <div className="form-label-title">Items</div>
-          <div className="form-label-title">CHF {bookingPrice.toFixed(2)}</div>
+          <div className="form-label-title">
+            CHF {convertTwoDecimal(bookingPrice)}
+          </div>
         </div>
         <div className="d-flex justify-content-between align-items-center">
           <div className="form-label-title">Booking Fees</div>
-          <div className="form-label-title">CHF {fee.toFixed(2)}</div>
+          <div className="form-label-title">CHF {convertTwoDecimal(fee)}</div>
         </div>
         {travelPercent > 0 && (
           <div className="d-flex justify-content-between align-items-center">
             <div className="form-label-title">Travel Agent Fees</div>
-            <div className="form-label-title">CHF {travelFee.toFixed(2)}</div>
+            <div className="form-label-title">
+              CHF {convertTwoDecimal(travelFee)}
+            </div>
           </div>
         )}
       </div>
@@ -140,7 +142,7 @@ const GiftCard = ({
             <strong>Total (CHF)</strong>
           </div>
           <div className="form-label-title">
-            <strong>CHF {totalPrice.toFixed(2)}</strong>
+            <strong>CHF {convertTwoDecimal(totalPrice)}</strong>
           </div>
         </div>
       </div>

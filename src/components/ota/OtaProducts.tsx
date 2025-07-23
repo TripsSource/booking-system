@@ -27,52 +27,36 @@ function OtaProducts({
   handleSortOrder: (value: string) => void;
 }) {
   const mProducts = useMemo(() => products, [products]).filter(
-    (product) => product.liveStatus
+    (product) => product.isActive
   );
   const mSelectedProduct = useMemo(() => selectedProduct, [selectedProduct]);
   const {
     _id,
-    timeSlots,
     description,
     destinationTitle,
     name,
-    isPrivate,
-    members,
-    revenues,
-    startingLocations,
-    guideDetails,
+    tours,
+    endDate,
+    shortDescription,
+    otaLive,
   } = mSelectedProduct;
   const margin = useSelector(marginState);
   const otaMargins = useSelector(OTAState);
-  const selectedRevenue = useCallback(
-    (id: string) =>
-      revenues.find((revenue) => revenue.startingLocationId === id),
-    [revenues]
-  );
 
   const productLoading = useSelector(productLoadingState);
   const productIdLoading = useSelector(productIdLoadingState);
 
   const productTitles = [
     { label: "Name", value: "name" },
-    { label: "Destination", value: "destination.destinationTitle" },
+    { label: "Destination", value: "destinationId.destinationTitle" },
     { label: "Total Tours", value: "options" },
-    { label: "Available Date", value: "timeSlots.endDate" },
-    { label: "Tour Type", value: "isPrivate" },
+    { label: "Available Date", value: "startDate" },
   ];
 
-  const calculateMargin = (
-    startingLocations: any,
-    startingLocationId: string
-  ) => {
+  const calculateMargin = (duration: number) => {
     const shortTour = parseFloat(margin.shortMarkup);
     const mediumTour = parseFloat(margin.mediumMarkup);
     const longTour = parseFloat(margin.longMarkup);
-    const duration = Number(
-      startingLocations.find(
-        (location: any) => location._id === startingLocationId
-      ).durationHours
-    );
     if (duration >= 1 && duration < 5) {
       return shortTour;
     } else if (duration >= 5 && duration < 10) {
@@ -82,20 +66,10 @@ function OtaProducts({
     }
   };
 
-  const calculateOtaMargin = (
-    otaName: string,
-    startingLocations: any,
-    startingLocationId: string
-  ) => {
+  const calculateOtaMargin = (otaName: string, duration: number) => {
     const selectedOta = otaMargins.find((margin) => margin.otaName === otaName);
     const shortTour = parseFloat(selectedOta?.shortMarkup ?? "0");
     const longTour = parseFloat(selectedOta?.dayMarkup ?? "0");
-    const duration = Number(
-      startingLocations.find(
-        (location: any) => location._id === startingLocationId
-      ).durationHours
-    );
-
     if (duration >= 1 && duration < 6) {
       return shortTour;
     } else {
@@ -157,15 +131,12 @@ function OtaProducts({
                     {product.destination}
                   </td>
                   <td className="text-center" style={{ cursor: "pointer" }}>
-                    {product.options}
+                    {product.tours}
                   </td>
                   <td className="text-center" style={{ cursor: "pointer" }}>
-                    {moment(new Date(product.availableDate ?? "")).format(
+                    {moment(new Date(product.startDate ?? "")).format(
                       "DD/MM/YYYY"
                     )}
-                  </td>
-                  <td className="text-center" style={{ cursor: "pointer" }}>
-                    {product.isPrivate ? "Private" : "Small Group"} Tour
                   </td>
                 </tr>
               ))
@@ -194,10 +165,24 @@ function OtaProducts({
                     <div>
                       <label className="form-label-title">Destiantion:</label>
                       <span className="mx-1">{destinationTitle}</span>
+                    </div>{" "}
+                    <div>
+                      <label className="form-label-title">
+                        Short Description:
+                      </label>
+                      <span className="mx-1">{shortDescription}</span>
                     </div>
                     <div>
                       <label className="form-label-title">Description:</label>
                       <span className="mx-1">{description}</span>
+                    </div>
+                    <div>
+                      <label className="form-label-title">
+                        External ID(Code):
+                      </label>
+                      <span className="mx-1">
+                        {otaLive.find((ota) => ota.otaName === otaType)?.id}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -206,16 +191,16 @@ function OtaProducts({
                   style={{ maxHeight: "520px", overflowY: "auto" }}
                 >
                   <label className="form-label-title">Options</label>
-                  {startingLocations &&
-                    startingLocations.length > 0 &&
-                    startingLocations.map((location, index) => (
+                  {tours &&
+                    tours.length > 0 &&
+                    tours.map((tour, index) => (
                       <div className="border p-2 mb-4" key={index}>
                         <div className="mt-2">
                           <label className="form-label-title">
                             Meeting Location {index + 1}:
                           </label>
                           <span className="form-control">
-                            {location.startingLocationName}
+                            {tour.meetingLocation}
                           </span>
                         </div>
                         <div className="mt-2">
@@ -233,13 +218,13 @@ function OtaProducts({
                         <div className="mt-2">
                           <label className="form-label-title">Duration:</label>
                           <span className="form-control">
-                            {location.durationHours} Hour(s)
+                            {tour.duration} Hour(s)
                           </span>
                         </div>
                         <div className="mt-2">
                           <label className="form-label-title">Type:</label>
                           <span className="form-control">
-                            {isPrivate ? "Private" : "Small Group"} Tour
+                            {tour.isPrivate ? "Private" : "Small Group"} Tour
                           </span>
                         </div>
                         <div className="mt-2">
@@ -247,9 +232,11 @@ function OtaProducts({
                             External product ID:
                           </label>
                           <span className="form-control">
-                            {otaType === "Project" || otaType === "Musement"
-                              ? location._id
-                              : _id + "_" + location._id}
+                            {
+                              tour.otaLive.find(
+                                (ota) => ota.otaName === otaType
+                              )?.id
+                            }
                           </span>
                         </div>
                         <div className="mt-2">
@@ -257,17 +244,18 @@ function OtaProducts({
                             Available until:
                           </label>
                           <span className="form-control">
-                            {timeSlots &&
-                              moment(new Date(timeSlots.endDate)).format(
-                                "DD/MM/YYYY"
-                              )}
+                            {endDate
+                              ? moment(new Date(endDate)).format("DD/MM/YYYY")
+                              : "Forever"}
                           </span>
                         </div>
                         <div className="mt-2">
                           <label className="form-label-title">
                             Participants:
                           </label>
-                          <span className="form-control">1 - {members}</span>
+                          <span className="form-control">
+                            1 - {tour.members}
+                          </span>
                         </div>
                         <div className="mt-2">
                           <label className="form-label-title">
@@ -276,38 +264,29 @@ function OtaProducts({
                           <span className="form-control">
                             CHF{" "}
                             {Math.ceil(
-                              Number(
-                                selectedRevenue(location._id)?.childrenCost ?? 0
-                              ) *
+                              ((tour.revenue.totalBulkCost ?? 0) +
+                                (tour.revenue.totalBulkCost ?? 0)) *
                                 Number(
-                                  calculateMargin(
-                                    startingLocations,
-                                    location._id
-                                  ) ?? 0
+                                  calculateMargin(Number(tour.duration)) ?? 0
                                 ) *
                                 Number(
                                   calculateOtaMargin(
                                     otaType,
-                                    startingLocations,
-                                    location._id
+                                    Number(tour.duration)
                                   ) ?? 0
                                 ) *
                                 100
                             ) / 100 || "0.00"}{" "}
                             / Child, CHF{" "}
                             {Math.ceil(
-                              Number(selectedRevenue(location._id)?.total) *
+                              Number(tour.revenue.childrenCost ?? 0) *
                                 Number(
-                                  calculateMargin(
-                                    startingLocations,
-                                    location._id
-                                  ) ?? 0
+                                  calculateMargin(Number(tour.duration)) ?? 0
                                 ) *
                                 Number(
                                   calculateOtaMargin(
                                     otaType,
-                                    startingLocations,
-                                    location._id
+                                    Number(tour.duration)
                                   ) ?? 0
                                 ) *
                                 100
@@ -319,7 +298,7 @@ function OtaProducts({
                           <label className="form-label-title">
                             GuideDetails:
                           </label>
-                          {guideDetails[index].itineraryStops.map((stop) => (
+                          {tour.guideDetails.map((stop) => (
                             <span className="form-control">
                               {stop.position} - {stop.pointsToCover}
                             </span>

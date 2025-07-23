@@ -56,7 +56,7 @@ const SourceTax = () => {
               {taxOption === "Tariff" && (
                 <>
                   <label className="form-label-title">Tariff Code</label>
-                  <input type="input" className="form-control" />
+                  <input type="text" className="form-control" />
                 </>
               )}
               {taxOption === "Predefined" && (
@@ -70,7 +70,7 @@ const SourceTax = () => {
               {taxOption === "Open" && (
                 <>
                   <label className="form-label-title">Open Tax</label>
-                  <input type="input" className="form-control" />
+                  <input type="text" className="form-control" />
                 </>
               )}
             </div>
@@ -165,7 +165,7 @@ const SourceTax = () => {
                 Street and House Number
               </label>
               <input
-                type="input"
+                type="text"
                 placeholder="Input street and house number"
                 className="form-control"
               />
@@ -173,7 +173,7 @@ const SourceTax = () => {
             <div className="col-sm-2">
               <label className="form-label-title">Zip Code</label>
               <input
-                type="input"
+                type="text"
                 placeholder="Input zipcode"
                 className="form-control"
               />
@@ -181,7 +181,7 @@ const SourceTax = () => {
             <div className="col-sm-2">
               <label className="form-label-title">City</label>
               <input
-                type="input"
+                type="text"
                 placeholder="Input city"
                 className="form-control"
               />
@@ -197,7 +197,7 @@ const SourceTax = () => {
             <div className="col-sm-6">
               <label className="form-label-title">Municipality Number</label>
               <input
-                type="input"
+                type="text"
                 placeholder="Input municipality number"
                 className="form-control"
               />
@@ -207,7 +207,7 @@ const SourceTax = () => {
             <div className="col-sm-6">
               <label className="form-label-title">Place of Birth</label>
               <input
-                type="input"
+                type="text"
                 placeholder="Input place of birth"
                 className="form-control"
               />
@@ -217,7 +217,7 @@ const SourceTax = () => {
                 Tax ID at the Country of Origin
               </label>
               <input
-                type="input"
+                type="text"
                 placeholder="Input Tax ID"
                 className="form-control"
               />

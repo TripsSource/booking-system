@@ -16,38 +16,38 @@ const BookingDetails = ({ product, handleProduct }: BookingDetailsProps) => {
     medicalQuestion,
   } = bookingDetails;
 
-  const handleBookingDetails = (param: string, value: boolean) => {
-    handleProduct("bookingDetails", { ...bookingDetails, [param]: value });
+  const handleBookingDetails = (type: string, value: boolean) => {
+    handleProduct("bookingDetails", { ...bookingDetails, [type]: value });
   };
 
   const questionsTitles = [
-    { title: QUESTIONS[0], param: "allergyQuestion", value: allergyQuestion },
+    { title: QUESTIONS[0], type: "allergyQuestion", value: allergyQuestion },
     {
       title: QUESTIONS[1],
-      param: "mobilityQuestion",
+      type: "mobilityQuestion",
       value: mobilityQuestion,
     },
-    { title: QUESTIONS[2], param: "medicalQuestion", value: medicalQuestion },
+    { title: QUESTIONS[2], type: "medicalQuestion", value: medicalQuestion },
   ];
 
   const leaderTitles = [
     {
       title: "First and Last Name",
-      param: "leadFullName",
+      type: "leadFullName",
       value: leadFullName,
     },
-    { title: "Date of Birth", param: "leadBirth", value: leadBirth },
-    { title: "Email Address", param: "leadEmail", value: leadEmail },
-    { title: "Mobile Number", param: "leadPhone", value: leadPhone },
+    { title: "Date of Birth", type: "leadBirth", value: leadBirth },
+    { title: "Email Address", type: "leadEmail", value: leadEmail },
+    { title: "Mobile Number", type: "leadPhone", value: leadPhone },
   ];
 
   const otherTitles = [
     {
       title: "Others First and Last Name",
-      param: "othersFullName",
+      type: "othersFullName",
       value: othersFullName,
     },
-    { title: "Others Date of Birth", param: "othersPhone", value: othersPhone },
+    { title: "Others Date of Birth", type: "othersPhone", value: othersPhone },
   ];
 
   return (
@@ -64,11 +64,11 @@ const BookingDetails = ({ product, handleProduct }: BookingDetailsProps) => {
               role="switch"
               checked={question.value}
               onChange={(e) =>
-                handleBookingDetails(question.param, e.target.checked)
+                handleBookingDetails(question.type, e.target.checked)
               }
-              id={question.param}
+              id={question.type}
             />
-            <label className="form-check-label ms-1" htmlFor={question.param}>
+            <label className="form-check-label ms-1" htmlFor={question.type}>
               {question.title}
             </label>
           </div>
@@ -90,11 +90,11 @@ const BookingDetails = ({ product, handleProduct }: BookingDetailsProps) => {
                 role="switch"
                 checked={leader.value}
                 onChange={(e) =>
-                  handleBookingDetails(leader.param, e.target.checked)
+                  handleBookingDetails(leader.type, e.target.checked)
                 }
-                id={leader.param}
+                id={leader.type}
               />
-              <label className="form-check-label ms-1" htmlFor={leader.param}>
+              <label className="form-check-label ms-1" htmlFor={leader.type}>
                 {leader.title}
               </label>
             </div>
@@ -117,11 +117,11 @@ const BookingDetails = ({ product, handleProduct }: BookingDetailsProps) => {
                 role="switch"
                 checked={other.value}
                 onChange={(e) =>
-                  handleBookingDetails(other.param, e.target.checked)
+                  handleBookingDetails(other.type, e.target.checked)
                 }
-                id={other.param}
+                id={other.type}
               />
-              <label className="form-check-label ms-1" htmlFor={other.param}>
+              <label className="form-check-label ms-1" htmlFor={other.type}>
                 {other.title}
               </label>
             </div>

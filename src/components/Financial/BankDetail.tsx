@@ -11,17 +11,17 @@ const BankDetail = () => {
               <label className="form-label-title">
                 Name of the Institution
               </label>
-              <input type="input" placeholder="" className="form-control" />
+              <input type="text" placeholder="" className="form-control" />
             </div>
             <div className="col-sm-6">
               <label className="form-label-title">IBAN</label>
-              <input type="input" placeholder="" className="form-control" />
+              <input type="text" placeholder="" className="form-control" />
             </div>
           </div>
           <div className="row mt-1 g-3">
             <div className="col-sm-8">
               <label className="form-label-title">BIC</label>
-              <input type="input" placeholder="" className="form-control" />
+              <input type="text" placeholder="" className="form-control" />
             </div>
             <div className="col-sm-4">
               <label className="form-label-title">Payment Group</label>

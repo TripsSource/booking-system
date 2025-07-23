@@ -16,10 +16,10 @@ const BookingReview = ({
   checkout: boolean;
   handleCheckout: (event: boolean) => void;
 }) => {
-  const { images, name, startingLocations } = product;
-  const { startingLocationId, bookingDate, startTime, childCount, adultCount } =
-    booking.bookingDetails;
+  const { images, name, tours } = product;
+  const { tourId, bookingDate, startTime, childCount, adultCount } = booking;
   const [termsPolicy, setTermsPolicy] = useState(false);
+  const tour = tours.find((tour) => tour._id === tourId);
   return (
     <form className="theme-form mega-form">
       <div className="mb-3">
@@ -58,14 +58,7 @@ const BookingReview = ({
               </div>
               <div className="ms-5">
                 <div className="form-label-title">Duration</div>
-                <div className="form-label-title">
-                  {
-                    startingLocations.filter(
-                      (location) => startingLocationId === location._id
-                    )[0].durationHours
-                  }{" "}
-                  Hours
-                </div>
+                <div className="form-label-title">{tour?.duration} Hours</div>
               </div>
             </div>
           </div>

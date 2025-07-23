@@ -19,35 +19,32 @@ const TourBooking = ({
   updateBookingDetails,
 }: {
   product: ProductDetailState;
-  bookingDetail: BookingType["bookingDetails"];
+  bookingDetail: BookingType;
   handleBookingDetails: (
     key: string,
     value: string | number | TravellerState[]
   ) => void;
   updateNestedBookingDetails: (
-    type: keyof BookingType["bookingDetails"],
+    type: keyof BookingType,
     key: string,
     value: string | boolean
   ) => void;
   updateBookingDetails: (
-    type: keyof BookingType["bookingDetails"],
+    type: keyof BookingType,
     value: string | boolean
   ) => void;
 }) => {
-  const { images, name, startingLocations, bookingDetails, isPrivate } =
-    product;
+  const { images, name, tours, bookingDetails } = product;
   const {
     adultCount,
     childCount,
     bookingDate,
     startTime,
-    startingLocationId,
+    tourId,
     questions,
     otherTravellers,
   } = bookingDetail;
-  const startingLocation = startingLocations.find(
-    (location) => location._id === startingLocationId
-  )?.meetingLocation;
+  const tour = tours.find((tour) => tour._id === tourId);
 
   const handleOtherTravellers = (index: number, key: string, val: string) => {
     let travellers = otherTravellers.map((value, i) => {
@@ -99,14 +96,7 @@ const TourBooking = ({
               </div>
               <div className="ms-5">
                 <div className="form-label-title">Duration</div>
-                <div className="form-label-title">
-                  {
-                    startingLocations.filter(
-                      (location) => startingLocationId === location._id
-                    )[0].durationHours
-                  }{" "}
-                  Hours
-                </div>
+                <div className="form-label-title">{tour?.duration} Hours</div>
               </div>
             </div>
           </div>
@@ -119,8 +109,12 @@ const TourBooking = ({
           <input
             className="form-control"
             type="text"
-            value={isPrivate ? bookingDetail.meetingLocation : startingLocation}
-            disabled={!isPrivate}
+            value={
+              tour?.isPrivate
+                ? bookingDetail.meetingLocation
+                : tour?.meetingLocation ?? ""
+            }
+            disabled={!tour?.isPrivate}
             onChange={(e) =>
               updateBookingDetails("meetingLocation", e.target.value)
             }
@@ -200,32 +194,40 @@ const TourBooking = ({
               {Number(adultCount) - 1 >= index + 1 ? "Adult" : "Child"})
             </label>
             <div className="d-flex row">
-              <div className="col-sm-6">
-                <label className="form-label-title">
-                  First name<span>*</span>
-                </label>
-                <input
-                  className="form-control"
-                  type="text"
-                  value={traveller.firstname}
-                  onChange={(e) =>
-                    handleOtherTravellers(index, "firstname", e.target.value)
-                  }
-                />
-              </div>
-              <div className="col-sm-6">
-                <label className="form-label-title">
-                  Last name<span>*</span>
-                </label>
-                <input
-                  className="form-control"
-                  type="text"
-                  value={traveller.lastname}
-                  onChange={(e) =>
-                    handleOtherTravellers(index, "lastname", e.target.value)
-                  }
-                />
-              </div>
+              {bookingDetails.othersFullName && (
+                <>
+                  <div className="col-sm-6">
+                    <label className="form-label-title">
+                      First name<span>*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={traveller.firstname}
+                      onChange={(e) =>
+                        handleOtherTravellers(
+                          index,
+                          "firstname",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="col-sm-6">
+                    <label className="form-label-title">
+                      Last name<span>*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={traveller.lastname}
+                      onChange={(e) =>
+                        handleOtherTravellers(index, "lastname", e.target.value)
+                      }
+                    />
+                  </div>
+                </>
+              )}
               <div className="d-flex row mt-3">
                 <div className="col-sm-6">
                   <label className="form-label-title">

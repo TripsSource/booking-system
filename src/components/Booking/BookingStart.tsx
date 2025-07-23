@@ -2,23 +2,12 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import moment from "moment";
-
-import { destinationTitlesState } from "@/store/destination";
-
 import { FaBus, FaCircleInfo } from "react-icons/fa6";
-import {
-  FiCheckCircle,
-  FiPlus,
-  FiRefreshCcw,
-  FiTrash,
-  FiUserMinus,
-  FiXCircle,
-} from "react-icons/fi";
+import { FiCheckCircle, FiRefreshCcw, FiXCircle } from "react-icons/fi";
 import { Check } from "react-feather";
 import { FaClock } from "react-icons/fa6";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import { BookingFormState } from "@/types/app/booking";
 import { ProductDetailState } from "@/types/app/product";
 import { BookingType } from "@/types/store/booking";
 import { marginState } from "@/store/financial";
@@ -55,40 +44,20 @@ const BookingStart = ({
   onStepClick: (index: number) => void;
   handleBookingDetails: (param: string, value: string) => void;
 }) => {
+  const { name, inclusions, exclusions, tours, startDate, endDate, blackOuts } =
+    product;
   const {
-    name,
-    revenues,
-    destinationTitle,
-    timeSlots,
-    inclusions,
-    exclusions,
-    startingLocations,
-  } = product;
-
-  const { bookingDetails } = booking;
-  const {
-    startingLocationId,
+    tourId,
     adultCount,
     childCount,
     infantCount,
     bookingDate,
     startTime,
-  } = bookingDetails;
+  } = booking;
 
-  const destinations = useSelector(destinationTitlesState);
-  const Cost = revenues?.find(
-    (item) => item.startingLocationId === startingLocationId
-  );
-
+  const tour = tours?.find((tour) => tour._id === tourId);
   const margins = useSelector(marginState);
-  const calculateMargin = (startingLocation: string) => {
-    if (!Array.isArray(startingLocations)) {
-      return 0;
-    }
-    const duration = Number(
-      startingLocations.find((location) => location._id === startingLocation)
-        ?.durationHours ?? 0
-    );
+  const calculateMargin = (duration: number) => {
     if (duration >= 1 && duration < 5) {
       return parseFloat(margins.shortMarkup);
     } else if (duration >= 5 && duration < 10) {
@@ -98,32 +67,53 @@ const BookingStart = ({
     }
   };
 
+  const adultPrice =
+    (Number(tour?.revenue.totalBulkCost ?? 0) +
+      Number(tour?.revenue.totalIndividualCost ?? 0)) *
+    calculateMargin(Number(tour?.duration));
+
+  const childPrice =
+    Number(tour?.revenue.childrenCost ?? 0) *
+    calculateMargin(Number(tour?.duration));
+
   const totalPrice = (
-    (Number(adultCount) *
-      ((Cost?.totalBulkCost ?? 0) + (Cost?.totalIndividualCost ?? 0)) +
-      Number(childCount) * Number(Cost?.childrenCost ?? 0)) *
-    calculateMargin(Cost?.startingLocationId ?? "")
+    Number(adultCount) * adultPrice +
+    Number(childCount) * childPrice
   ).toFixed(2);
 
   const generatePriceEvents = () => {
-    const start = moment(timeSlots?.startDate || Date.now()).format(
+    // Ensure startDate and endDate are correctly formatted
+    const start = moment(startDate || Date.now()).format("YYYY-MM-DD");
+    const end = moment(endDate || moment().add(10, "years")).format(
       "YYYY-MM-DD"
     );
-    const end = moment(timeSlots?.endDate || Date.now()).format("YYYY-MM-DD");
-    const blackDays: string[] = timeSlots?.blackOuts || [];
+    // Ensure blackOuts are defined
+    const blackDays = blackOuts || [];
+    // Calculate the total number of days between start and end
     const totalDays = moment(end).diff(moment(start), "days") + 1;
-    const tomorrow = moment().add(1, "days").format("YYYY-MM-DD"); // Get tomorrow's date
-
+    // Get tomorrow's date and set it to start of the day (midnight)
+    const tomorrow = moment()
+      .add(1, "days")
+      .startOf("day")
+      .format("YYYY-MM-DD");
+    // Generate events for the days between start and end
     const events = Array.from({ length: totalDays }).map((_, index) => {
       const date = moment(start)
         .clone()
         .add(index, "days")
         .format("YYYY-MM-DD");
-
-      if (blackDays.map((e) => moment(e).format("YYYY-MM-DD")).includes(date)) {
-        return undefined;
+      // Check if the date is in blackDays (exclude blackout dates)
+      if (
+        blackDays.some((blackout) => {
+          const blackoutStart = moment(blackout.startDate).startOf("day"); // Start of blackout day
+          const blackoutEnd = moment(blackout.endDate).endOf("day"); // End of blackout day
+          return moment(date).isBetween(blackoutStart, blackoutEnd, null, "[]"); // Check if within blackout range (inclusive)
+        })
+      ) {
+        return undefined; // Exclude this date from events
       }
 
+      // Exclude dates before tomorrow (exclude the 19th if today is 20th)
       if (moment(date).isBefore(tomorrow, "day")) {
         return undefined;
       }
@@ -135,17 +125,31 @@ const BookingStart = ({
       };
     });
 
+    // Filter out undefined events
     return events.filter((event) => event !== undefined);
   };
 
   const showDayContent = (args: any) => {
     const dateFormatted = moment(args.date).format("YYYY-MM-DD");
-    const tomorrow = moment().add(1, "days").format("YYYY-MM-DD");
+    const tomorrow = moment()
+      .add(1, "days")
+      .startOf("day")
+      .format("YYYY-MM-DD");
 
+    // Check if it's a past date
     const isPastDate = moment(dateFormatted).isBefore(tomorrow, "day");
-    const isBlackoutDate = timeSlots?.blackOuts
-      .map((e) => moment(e).format("YYYY-MM-DD"))
-      .includes(dateFormatted);
+
+    // Check if the date is within any blackout date range
+    const isBlackoutDate = blackOuts?.some((blackout) => {
+      const blackoutStart = moment(blackout.startDate).startOf("day");
+      const blackoutEnd = moment(blackout.endDate).endOf("day");
+      return moment(dateFormatted).isBetween(
+        blackoutStart,
+        blackoutEnd,
+        null,
+        "[]"
+      ); // Inclusive of start and end
+    });
 
     return (
       <div
@@ -159,7 +163,7 @@ const BookingStart = ({
         }}
         style={{
           cursor: isPastDate || isBlackoutDate ? "not-allowed" : "pointer",
-          opacity: isPastDate || isBlackoutDate ? 0.5 : 1, // Dim past or blackout dates
+          opacity: isPastDate || isBlackoutDate ? 0.5 : 1,
         }}
       >
         {moment(args.date).format("DD")}
@@ -177,29 +181,24 @@ const BookingStart = ({
           </label>
           <select
             className="form-control js-example-basic-single col-sm-12"
-            value={booking.bookingDetails.startingLocationId}
-            onChange={(e) =>
-              handleBookingDetails("startingLocationId", e.target.value)
-            }
+            value={booking.tourId}
+            onChange={(e) => handleBookingDetails("tourId", e.target.value)}
           >
             {product !== undefined &&
-              revenues?.map((value, index) => (
+              tours?.map((selectTour, index) => (
                 <option
                   key={index}
-                  value={value.startingLocationId}
+                  value={selectTour._id}
                   className="form-control"
                 >
-                  {
-                    destinations.filter(
-                      (item) => item._id === value.startingLocationId
-                    )[0]?.destinationTitle
-                  }{" "}
-                  - ₣{" "}
+                  {selectTour.destinationTitle} - ₣
                   {(
-                    ((value?.totalBulkCost ?? 0) +
-                      (value?.totalIndividualCost ?? 0)) *
-                    calculateMargin(value.startingLocationId)
-                  ).toLocaleString()}
+                    (Number(selectTour?.revenue.totalBulkCost ?? 0) +
+                      Number(selectTour?.revenue.totalIndividualCost ?? 0)) *
+                    calculateMargin(Number(selectTour?.duration))
+                  ).toLocaleString()}{" "}
+                  ({selectTour.isPrivate ? "Private Tour" : "Small Group Tour"}-
+                  {selectTour.withDriver ? "With Driver" : "No Driver"})
                 </option>
               ))}
           </select>
@@ -223,7 +222,7 @@ const BookingStart = ({
                     handleBookingDetails(
                       "adultCount",
                       `${Math.min(
-                        Number(product.members) -
+                        Number(tour?.members) -
                           Number(childCount) -
                           Number(infantCount),
                         Math.max(+adultCount - 1, 1)
@@ -242,7 +241,7 @@ const BookingStart = ({
                     handleBookingDetails(
                       "adultCount",
                       `${Math.min(
-                        Number(product.members) -
+                        Number(tour?.members) -
                           Number(childCount) -
                           Number(infantCount),
                         Math.max(+adultCount + 1, 0)
@@ -268,7 +267,7 @@ const BookingStart = ({
                     handleBookingDetails(
                       "childCount",
                       `${Math.min(
-                        Number(product.members) -
+                        Number(tour?.members) -
                           Number(adultCount) -
                           Number(infantCount),
                         Math.max(+childCount - 1, 0)
@@ -287,7 +286,7 @@ const BookingStart = ({
                     handleBookingDetails(
                       "childCount",
                       `${Math.min(
-                        Number(product.members) -
+                        Number(tour?.members) -
                           Number(adultCount) -
                           Number(infantCount),
                         Math.max(+childCount + 1, 0)
@@ -313,7 +312,7 @@ const BookingStart = ({
                     handleBookingDetails(
                       "infantCount",
                       `${Math.min(
-                        Number(product.members) -
+                        Number(tour?.members) -
                           Number(adultCount) -
                           Number(childCount),
                         Math.max(+infantCount - 1, 0)
@@ -332,7 +331,7 @@ const BookingStart = ({
                     handleBookingDetails(
                       "infantCount",
                       `${Math.min(
-                        Number(product.members) -
+                        Number(tour?.members) -
                           Number(adultCount) -
                           Number(childCount),
                         Math.max(+infantCount + 1, 0)
@@ -392,7 +391,7 @@ const BookingStart = ({
               <FaClock color={"#198754"} size={20} className="me-2" />
               <label className="mt-2">Choose a time</label>
             </div>
-            {timeSlots?.times.map((time, index) => (
+            {tour?.times.map((time, index) => (
               <button
                 type="button"
                 className={`btn mt-2 mx-1 ${
@@ -492,7 +491,7 @@ const BookingStart = ({
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div className="fs-5 w-50 text-success">
-                  {destinationTitle} Tour - {name}
+                  {product.destinationTitle} Tour - {name}
                 </div>
                 <div>
                   <div className="fs-5 text-end text-success">
@@ -506,26 +505,19 @@ const BookingStart = ({
               </div>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex flex-column">
-                  {adultCount !== 0 && (
+                  {adultCount > 0 && (
                     <div className="w-50 text-nowrap">
                       <label>
                         Adult:{adultCount} x CHF(₣){" "}
-                        {(
-                          ((Cost?.totalBulkCost ?? 0) +
-                            (Cost?.totalIndividualCost ?? 0)) *
-                          calculateMargin(Cost?.startingLocationId ?? "")
-                        ).toLocaleString()}
+                        {adultPrice.toLocaleString()}
                       </label>
                     </div>
                   )}
-                  {childCount !== 0 && (
+                  {childCount > 0 && (
                     <div className="w-50 text-nowrap">
                       <label>
                         Child:{childCount} x CHF(₣){" "}
-                        {(
-                          Cost?.childrenCost ??
-                          0 * calculateMargin(Cost?.startingLocationId ?? "")
-                        ).toLocaleString()}
+                        {childPrice.toLocaleString()}
                       </label>
                     </div>
                   )}

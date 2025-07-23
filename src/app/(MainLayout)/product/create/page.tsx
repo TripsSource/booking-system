@@ -13,28 +13,27 @@ import AvailabilityAndPricing from "@/components/Product/AvailabilityAndPricing"
 
 import {
   ProductDetailState,
-  ProductCostState,
-  ProductLocationState,
   ProductBookingDetailsState,
-  timeSlotsState,
+  ProductTourState,
+  ProductRevenueState,
   onlineMapState,
-  ProductGuideState,
-  ProductSuppliersState,
+  ProductSupplierState,
+  ProductGuideDetailState,
 } from "@/types/app/product";
 import { PRODUCTSTEPS, SMALLGROUP_TOUR_DEFAULT } from "@/constants/data";
 import { crateProductAction, productLoadingState } from "@/store/products";
 import { destinationTitlesState } from "@/store/destination";
 import { getDestinationTitlesAction } from "@/store/destination";
-import LoadingButton from "@/Common/LoadingButton";
 import { readDestinationTitleType } from "@/types/store/destination";
 import RoleProvider from "@/providers/RoleProvider";
 import {
-  initialCost,
+  initialTour,
   initialProduct,
 } from "@/app/(MainLayout)/product/InitialProductState";
 import GuideDetails from "@/components/Product/GuideDetails";
 import SupplierDetails from "@/components/Product/SupplierDetails";
 import { getSuppliersAction } from "@/store/contacts";
+import LoadingAuthButton from "@/Common/LoadingAuthButton";
 
 const CreateProduct = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -52,56 +51,99 @@ const CreateProduct = () => {
 
   useEffect(() => {
     const getDestinationTitles = async () => {
-      await dispatch(getDestinationTitlesAction({})).then((res) => {
-        if (Array.isArray(res.payload)) {
-          formatProduct(res.payload[0]._id);
-        }
-      });
+      const { payload } = await dispatch(getDestinationTitlesAction({}));
       await dispatch(getSuppliersAction({}));
+      if (payload?.["data"]) formatProduct(payload.data[0]._id);
     };
-
     getDestinationTitles();
   }, []);
 
   const desitnation = useSelector(destinationTitlesState);
 
   const handleProduct = (
-    param: string,
+    type: string,
     value:
       | Date
       | string
       | boolean
-      | timeSlotsState
       | onlineMapState
       | ProductBookingDetailsState
       | File[]
       | string[]
-      | ProductSuppliersState[]
-      | ProductCostState[]
-      | ProductGuideState[]
+      | ProductTourState[]
+      | { startDate: string; endDate: string }[]
   ) => {
-    setProduct({ ...product, [param]: value });
+    setProduct({ ...product, [type]: value });
   };
 
-  const validateRevenueCost = (costs: ProductCostState[]): string[] => {
-    const errors: string[] = [];
-
-    costs.map((cost: ProductCostState, index: number) => {
-      // Validate each individual ProductCostState object
-      Object.keys(cost).forEach((key) => {
-        if (cost[key as keyof ProductCostState] === "") {
-          errors.push(`Revenue ${index + 1}: ${key} cannot be empty.`);
+  const handleTours = (
+    i: number,
+    type: string,
+    value:
+      | string
+      | boolean
+      | number
+      | ProductRevenueState
+      | string[]
+      | ProductSupplierState[]
+      | ProductGuideDetailState[]
+  ) =>
+    handleProduct(
+      "tours",
+      product.tours.map((tour: ProductTourState, index: number) => {
+        if (i === index) {
+          return {
+            ...tour,
+            [type]: value,
+            ...(type === "isPrivate"
+              ? {
+                  members: value ? "" : SMALLGROUP_TOUR_DEFAULT.toString(),
+                  meetingLocation: "",
+                }
+              : {}),
+          };
+        } else {
+          return tour;
         }
-      });
-    });
+      })
+    );
 
-    return errors;
+  const addTour = () => {
+    let destinations: { _id: string }[] = [];
+    product.tours.forEach((tour) => {
+      const count = product.tours.filter(
+        (pTour) => pTour.destinationId === tour.destinationId
+      ).length;
+      if (count < 4) destinations.push({ _id: tour.destinationId });
+    });
+    if (destinations.length < 1)
+      destinations = desitnation.filter(
+        (desitnation: readDestinationTitleType) =>
+          !product.tours.some(
+            (tour: ProductTourState) => tour.destinationId === desitnation._id
+          )
+      );
+    const newTours = [
+      ...product.tours,
+      { ...initialTour, destinationId: destinations[0]._id },
+    ];
+    handleProduct("tours", newTours);
+  };
+
+  const removeTour = (i: number) => {
+    const tours = product.tours.filter((_, index) => index !== i);
+    handleProduct("tours", tours);
+  };
+
+  const formatProduct = (Id: string) => {
+    setProduct({
+      ...initialProduct,
+      destinationId: Id,
+      tours: [{ ...initialTour, destinationId: Id }],
+    });
   };
 
   const saveProduct = async () => {
-    const validationErrors = validateRevenueCost(product.revenues);
-    // if (validationErrors.length > 0) {
-    // } else {
     const { payload } = await dispatch(crateProductAction(product));
     if (payload.error) {
       toast.error(`${payload.error}`);
@@ -109,146 +151,7 @@ const CreateProduct = () => {
       toast.success(`${payload.message}`);
       formatProduct(desitnation[0]._id);
     }
-
-    // }
   };
-
-  const handleLocations = (i: number, param: string, value: string) => {
-    const sameDestination = product.startingLocations.filter(
-      (location: ProductLocationState) => location._id === value
-    );
-    let newLocations = product.startingLocations;
-    if (sameDestination.length > 0) {
-      newLocations = newLocations.map((location) => {
-        if (sameDestination[0]._id === location._id)
-          return { ...location, _id: product.startingLocations[i]._id };
-        else return location;
-      });
-    }
-    const startingLocations = newLocations.map((location, index) => {
-      if (index === i) return { ...location, [param]: value };
-      else return location;
-    });
-    if (param === "_id") {
-      const revenues = product.revenues.map((revenue, index) => ({
-        ...revenue,
-        startingLocationId: startingLocations[index]._id,
-      }));
-      const guideDetails = product.guideDetails.map(
-        (guide: ProductGuideState, index: number) => ({
-          ...guide,
-          startingLocationId: startingLocations[index]._id,
-        })
-      );
-      const suppliers = product.suppliers.map((supplier, index) => ({
-        ...supplier,
-        startingLocationId: startingLocations[index]._id,
-      }));
-      setProduct({
-        ...product,
-        startingLocations,
-        revenues,
-        guideDetails,
-        suppliers,
-      });
-    } else {
-      setProduct({ ...product, startingLocations });
-    }
-  };
-
-  const removeLocations = (i: number) => {
-    const startingLocations = product.startingLocations.filter(
-      (_, index) => index !== i
-    );
-    const revenues = product.revenues.filter((_, index) => index !== i);
-    const guideDetails = product.guideDetails.filter((_, index) => index !== i);
-    const suppliers = product.suppliers.filter((_, index) => index !== i);
-    setProduct({
-      ...product,
-      startingLocations,
-      revenues,
-      guideDetails,
-      suppliers,
-    });
-  };
-
-  const addLocations = () => {
-    const destinations = desitnation.filter(
-      (item: readDestinationTitleType) =>
-        !product.startingLocations.some(
-          (location: ProductLocationState) => location._id === item._id
-        )
-    );
-    setProduct({
-      ...product,
-      startingLocations: [
-        ...product.startingLocations,
-        { _id: destinations[0]._id, meetingLocation: "", durationHours: "" },
-      ],
-      revenues: [
-        ...product.revenues,
-        { ...initialCost, startingLocationId: destinations[0]._id },
-      ],
-      guideDetails: [
-        ...product.guideDetails,
-        {
-          startingLocationId: destinations[0]._id,
-          itineraryStops: [
-            {
-              position: "",
-              pointsToCover: "",
-            },
-          ],
-        },
-      ],
-      suppliers: [
-        ...product.suppliers,
-        {
-          startingLocationId: destinations[0]._id,
-          contacts: [{ supplierId: "", timeSlot: "" }],
-        },
-      ],
-    });
-  };
-
-  const formatProduct = (Id: string) => {
-    setProduct({
-      ...initialProduct,
-      destination: Id,
-      startingLocations: [
-        {
-          _id: Id,
-          meetingLocation: "",
-          durationHours: "",
-        },
-      ],
-      revenues: [
-        {
-          ...initialProduct.revenues[0],
-          startingLocationId: Id,
-        },
-      ],
-      guideDetails: [
-        {
-          ...initialProduct.guideDetails[0],
-          startingLocationId: Id,
-        },
-      ],
-      suppliers: [
-        {
-          ...product.suppliers[0],
-          startingLocationId: Id,
-        },
-      ],
-    });
-  };
-
-  useEffect(() => {
-    handleProduct(
-      "members",
-      product.isPrivate ? "" : SMALLGROUP_TOUR_DEFAULT.toString()
-    );
-  }, [product.isPrivate]);
 
   return (
     <RoleProvider target="Product">
@@ -265,7 +168,7 @@ const CreateProduct = () => {
                     className="form-check-label mx-5 mt-2"
                     htmlFor="live_status"
                   >
-                    {product.liveStatus ? "Live" : "Not Live"}
+                    {product.isActive ? "Live" : "Not Live"}
                   </label>
                   <input
                     className="form-check-input"
@@ -276,18 +179,19 @@ const CreateProduct = () => {
                     type="checkbox"
                     role="switch"
                     id="live_status"
-                    checked={product.liveStatus}
+                    checked={product.isActive}
                     onChange={(e) =>
-                      handleProduct("liveStatus", e.target.checked)
+                      handleProduct("isActive", e.target.checked)
                     }
                   />
                 </div>
-                <LoadingButton
+                <LoadingAuthButton
                   {...{
                     loading,
-                    func: saveProduct,
+                    onFunc: saveProduct,
                     title: "Save Product",
                     classes: "btn btn-primary btn-block w-10 m-l-20",
+                    disabled: product.name === "",
                   }}
                 />
               </div>
@@ -319,37 +223,25 @@ const CreateProduct = () => {
                     {...{
                       product,
                       handleProduct,
-                      handleLocations,
-                      addLocations,
-                      removeLocations,
+                      handleTours,
+                      addTour,
+                      removeTour,
                     }}
                   />
-                  <AvailabilityAndPricing
-                    {...{
-                      product,
-                      handleProduct,
-                    }}
-                  />
+                  <AvailabilityAndPricing {...{ product, handleProduct }} />
                 </>
               )}
               {stepTab === 1 && <ContentWriterArea {...{ product }} />}
               {stepTab === 2 && (
                 <PictureInsertion {...{ product, handleProduct }} />
               )}
-              {stepTab === 3 && <CostDetails {...{ product, handleProduct }} />}
+              {stepTab === 3 && <CostDetails {...{ product, handleTours }} />}
               {stepTab === 4 && (
-                <BookingDetails
-                  {...{
-                    product,
-                    handleProduct,
-                  }}
-                />
+                <BookingDetails {...{ product, handleProduct }} />
               )}
-              {stepTab === 5 && (
-                <GuideDetails {...{ product, handleProduct }} />
-              )}
+              {stepTab === 5 && <GuideDetails {...{ product, handleTours }} />}
               {stepTab === 6 && (
-                <SupplierDetails {...{ product, handleProduct }} />
+                <SupplierDetails {...{ product, handleTours }} />
               )}
             </div>
             <div className="d-flex justify-content-between mb-3 m-l-10 m-r-10">

@@ -12,12 +12,34 @@ import Statistics from "@/components/Financial/Statistics";
 import WageTypes from "@/components/Financial/WageTypes";
 import { PAYROLLSTEPS } from "@/constants/data";
 import RoleProvider from "@/providers/RoleProvider";
+import { companyDataState } from "@/types/app/financial";
 import React, { useEffect, useState } from "react";
 import { TabContent, TabPane } from "reactstrap";
 
 const PayrollPage = () => {
   const [stepTab, setStepTab] = useState(0);
   const [subStepTab, setSubStepTab] = useState<number>(10);
+
+  const [data, setData] = useState<companyDataState>({
+    company: {
+      name: "",
+      registNumber: "",
+      deputyName: "",
+      workNumber: "",
+      taxCode: "",
+      paymentMethod: "",
+      emailTemplate: "",
+      others: "",
+    },
+    insurances: {
+      rate: "",
+      contribution: "",
+      benefitRate: "",
+      insuranceRate: "",
+      accidentRate: "",
+      dailyRate: "",
+    },
+  });
 
   useEffect(() => {
     const currentStep = PAYROLLSTEPS[stepTab];
@@ -81,7 +103,7 @@ const PayrollPage = () => {
             }
             className="description-details"
           >
-            <TabPane tabId={10} className="menu-part">
+            {/* <TabPane tabId={10} className="menu-part">
               <PersonalInformation />
             </TabPane>
             <TabPane tabId={11} className="menu-part">
@@ -95,23 +117,23 @@ const PayrollPage = () => {
             </TabPane>
             <TabPane tabId={14} className="menu-part">
               <SourceTax />
+            </TabPane> */}
+            <TabPane tabId={10} className="menu-part">
+              <MasterData {...{ companyData: data.company }} />
             </TabPane>
-            <TabPane tabId={21} className="menu-part">
-              <MasterData />
+            <TabPane tabId={11} className="menu-part">
+              <CompanyInsuraces {...{ insuranceData: data.insurances }} />
             </TabPane>
-            <TabPane tabId={22} className="menu-part">
-              <CompanyInsuraces />
-            </TabPane>
-            <TabPane tabId={23} className="menu-part">
+            <TabPane tabId={12} className="menu-part">
               <WageTypes />
             </TabPane>
-            <TabPane tabId={24} className="menu-part">
+            <TabPane tabId={13} className="menu-part">
               <AccountPlan />
             </TabPane>
-            <TabPane tabId={2} className="menu-part">
+            <TabPane tabId={1} className="menu-part">
               <SalarySlip />
             </TabPane>
-            <TabPane tabId={3} className="menu-part">
+            <TabPane tabId={2} className="menu-part">
               <Statistics />
             </TabPane>
           </TabContent>

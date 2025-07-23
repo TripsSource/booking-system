@@ -36,31 +36,23 @@ const ReadProducts = ({ products, deleted, setDeleted }: ReadProductsProps) => {
   const toggleDeleteModal = () => setDeleteModal(!deletefModal);
   const openModal = async (id: string) => {
     const { payload } = await dispatch(getProductIdAction(id));
-
-    setData(payload as ProductDetailState);
-    setModalOpen(true);
+    if (payload?.["data"]) {
+      setData(payload.data as ProductDetailState);
+      setModalOpen(true);
+    } else toast.error(`${payload.error}`);
   };
   const openDeleteModal = async () => {
-    await dispatch(deleteProductAction(deleteId)).then((res) => {
-      if (res.payload.message) {
-        toast.success(`${res.payload.message}`);
-      } else {
-        toast.error(`${res.payload.error}`);
-      }
-    });
+    const { payload } = await dispatch(deleteProductAction(deleteId));
+    if (payload.message) toast.success(`${payload.message}`);
+    else toast.error(`${payload.error}`);
     setDeleted(!deleted);
     setDeleteModal(false);
   };
-
-  const handleLiveStatus = async (id: string) => {
-    await dispatch(handleLiveStatusAction(id)).then((res) => {
-      if (res.payload.message) {
-        toast.success(`${res.payload.message}`);
-      } else {
-        toast.error(`${res.payload.error}`);
-      }
-      setDeleted(!deleted);
-    });
+  const handleIsActiveStatus = async (id: string) => {
+    const { payload } = await dispatch(handleLiveStatusAction(id));
+    if (payload.message) toast.success(`${payload.message}`);
+    else toast.error(`${payload.error}`);
+    setDeleted(!deleted);
   };
   return (
     <>
@@ -69,6 +61,7 @@ const ReadProducts = ({ products, deleted, setDeleted }: ReadProductsProps) => {
           <tr>
             <th className="text-center">Avatar</th>
             <th className="text-center">Name</th>
+            <th className="text-center">Total Tours</th>
             <th className="text-center">Available Date</th>
             <th className="text-center">Price</th>
             <th className="text-center">Live Booking</th>
@@ -80,7 +73,7 @@ const ReadProducts = ({ products, deleted, setDeleted }: ReadProductsProps) => {
           trustProducts.length < 1 &&
           isLoading ? (
             <tr>
-              <td colSpan={6}>
+              <td colSpan={7}>
                 <PageLoader />
               </td>
             </tr>
@@ -113,9 +106,16 @@ const ReadProducts = ({ products, deleted, setDeleted }: ReadProductsProps) => {
                   className="text-center"
                   style={{ cursor: "pointer" }}
                 >
-                  {moment(new Date(product.availableDate ?? "")).format(
-                    "DD/MM/YYYY"
-                  )}
+                  {product.tours}
+                </td>
+                <td
+                  onClick={() => openModal(product._id)}
+                  className="text-center"
+                  style={{ cursor: "pointer" }}
+                >
+                  {product.endDate
+                    ? moment(new Date(product.endDate)).format("DD/MM/YYYY")
+                    : "Forever"}
                 </td>
                 <td
                   onClick={() => openModal(product._id)}
@@ -135,15 +135,15 @@ const ReadProducts = ({ products, deleted, setDeleted }: ReadProductsProps) => {
                       id="live_status"
                       style={{ cursor: "pointer" }}
                       disabled={isLoading}
-                      checked={product.liveStatus}
-                      onChange={(e) => handleLiveStatus(product._id)}
+                      checked={product.isActive}
+                      onChange={(e) => handleIsActiveStatus(product._id)}
                     />
                     <label
                       className="form-check-label px-3"
                       htmlFor="live_status"
                       style={{ cursor: "pointer" }}
                     >
-                      {product.liveStatus ? "Live" : "Not Live"}
+                      {product.isActive ? "Live" : "Not Live"}
                     </label>
                   </div>
                 </td>
@@ -190,10 +190,7 @@ const ReadProducts = ({ products, deleted, setDeleted }: ReadProductsProps) => {
           <div className="row g-2">
             <div className="col-sm-12">
               <p>Description:{data.description}</p>
-              <p>
-                Private: {data.isPrivate ? "Private Tour" : "Small Group Tour"}
-              </p>
-              <p>Members: {data.members}</p>
+              <p>Tours: {data.tours?.length}</p>
               <div className="mt-3">
                 <p>Inclusions:</p>
                 <ul className="mx-3">

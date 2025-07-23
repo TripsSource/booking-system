@@ -6,65 +6,49 @@ import { api } from "@/utils/api";
 export const createProduct = async (data: ProductDetailState) => {
   const formData = new FormData();
   formData.append("name", data.name);
-  formData.append("isPrivate", `${data.isPrivate}`);
-  formData.append("members", data.members);
-  formData.append("withDriver", `${data.withDriver}`);
-  formData.append("timeSlots", JSON.stringify(data.timeSlots));
   formData.append("bookingDetails", JSON.stringify(data.bookingDetails));
   data.images.map((image: File) => {
     formData.append("images", image);
   });
-  formData.append("startingLocations", JSON.stringify(data.startingLocations));
-  formData.append(
-    "destination",
-    typeof data.destination === "string"
-      ? data.destination
-      : data.destination._id
-  );
+  formData.append("destinationId", data.destinationId);
   formData.append("description", data.description);
+  formData.append("shortDescription", data.shortDescription);
+  formData.append("tours", JSON.stringify(data.tours));
+  formData.append("startDate", data.startDate);
+  formData.append("endDate", data.endDate ?? "");
+  formData.append("blackOuts", JSON.stringify(data.blackOuts));
   formData.append("onlineMap", JSON.stringify(data.onlineMap));
   formData.append("exclusions", JSON.stringify(data.exclusions));
   formData.append("inclusions", JSON.stringify(data.inclusions));
   formData.append("bring", data.bring);
-  formData.append("knowBeforeGo", data.knowBeforeGo);
+  formData.append("knowBefore", data.knowBefore);
   // ticket
-  formData.append("revenues", JSON.stringify(data.revenues));
-  formData.append("liveStatus", `${data.liveStatus}`);
-  formData.append("guideDetails", JSON.stringify(data.guideDetails));
-  formData.append("suppliers", JSON.stringify(data.suppliers));
+  formData.append("isActive", `${data.isActive}`);
   return await api.post("/api/products", formData).then((res) => res.data);
 };
 
 export const updateProduct = async (data: ProductDetailState) => {
   const formData = new FormData();
-  formData.append("name", data.name);
   formData.append("deletedImages", JSON.stringify(data.deletedImages));
-  formData.append(
-    "destination",
-    typeof data.destination === "string"
-      ? data.destination
-      : data.destination._id
-  );
-  formData.append("description", data.description);
-  formData.append("isPrivate", `${data.isPrivate}`);
-  formData.append("withDriver", `${data.withDriver}`);
-  formData.append("timeSlots", JSON.stringify(data.timeSlots));
+  formData.append("name", data.name);
   formData.append("bookingDetails", JSON.stringify(data.bookingDetails));
-  formData.append("members", data.members);
   data.images.map((image: File) => {
     formData.append("images", image);
   });
-  formData.append("startingLocations", JSON.stringify(data.startingLocations));
+  formData.append("destinationId", data.destinationId);
+  formData.append("description", data.description);
+  formData.append("shortDescription", data.shortDescription);
+  formData.append("blackOuts", JSON.stringify(data.blackOuts));
+  formData.append("tours", JSON.stringify(data.tours));
+  formData.append("startDate", data.startDate);
+  formData.append("endDate", data.endDate ?? "");
   formData.append("onlineMap", JSON.stringify(data.onlineMap));
   formData.append("exclusions", JSON.stringify(data.exclusions));
   formData.append("inclusions", JSON.stringify(data.inclusions));
   formData.append("bring", data.bring);
-  formData.append("knowBeforeGo", data.knowBeforeGo);
+  formData.append("knowBefore", data.knowBefore);
   // ticket
-  formData.append("revenues", JSON.stringify(data.revenues));
-  formData.append("liveStatus", `${data.liveStatus}`);
-  formData.append("guideDetails", JSON.stringify(data.guideDetails));
-  formData.append("suppliers", JSON.stringify(data.suppliers));
+  formData.append("isActive", `${data.isActive}`);
 
   return await api
     .put(`/api/products/${data._id}`, formData)
@@ -84,13 +68,17 @@ export const getProductId = async (id: string) => {
 };
 
 export const getProducts = async ({
+  sort,
+  order,
   page,
   perPage,
 }: {
+  sort: string;
+  order: string;
   page?: number;
   perPage?: number;
 }) => {
   return await api
-    .get(`/api/products?admin=true`, { params: { page, perPage } })
+    .get(`/api/products?admin=true`, { params: { page, perPage, sort, order } })
     .then((res) => res.data);
 };

@@ -1,45 +1,31 @@
 import { suppliersState } from "@/store/contacts";
 import { destinationTitlesState } from "@/store/destination";
-import { ProductDetailState } from "@/types/app/product";
+import { SupplierDetailProps } from "@/types/components/product";
 import React from "react";
 import { Trash2 } from "react-feather";
 import { useSelector } from "react-redux";
 
-function SupplierDetails({
-  product,
-  handleProduct,
-}: {
-  product: ProductDetailState;
-  handleProduct: (
-    param: string,
-    value: {
-      startingLocationId: string;
-      contacts: { supplierId: string; timeSlot: string }[];
-    }[]
-  ) => void;
-}) {
-  const { suppliers, startingLocations } = product;
+function SupplierDetails({ product, handleTours }: SupplierDetailProps) {
+  const { tours } = product;
   const destinations = useSelector(destinationTitlesState);
   const [activeTab, setActiveTab] = React.useState(0);
-  const tabs = startingLocations.map(
-    (item) =>
-      destinations.find((item2) => item2._id === item._id)?.destinationTitle
+  const tabs = tours.map(
+    (tour) =>
+      destinations.find((destination) => destination._id === tour.destinationId)
+        ?.destinationTitle
   );
+  const { suppliers } = tours[activeTab];
   const supplierOptions = useSelector(suppliersState);
   const handleProductSuppliers = (i: number, type: string, value: string) => {
-    const newSuppliers = suppliers.map((supplierData, index) => {
-      if (index === activeTab) {
+    const newSuppliers = suppliers.map((supplier, index) => {
+      if (index === i)
         return {
-          ...supplierData,
-          contacts: supplierData.contacts.map((supplier, contactIndex) => {
-            if (contactIndex === i) return { ...supplier, [type]: value };
-            return supplier;
-          }),
+          ...supplier,
+          [type]: value,
         };
-      }
-      return supplierData;
+      return supplier;
     });
-    handleProduct("suppliers", newSuppliers);
+    handleTours(activeTab, "suppliers", newSuppliers);
   };
 
   return (
@@ -63,14 +49,14 @@ function SupplierDetails({
         </ul>
         <div className="mb-3 mx-5">
           {suppliers.length > 0 &&
-            suppliers[activeTab].contacts.map((supplierData, index) => (
+            suppliers.map((supplierData, index) => (
               <div className="d-flex justify-content-between mb-3" key={index}>
                 <select
                   className="col-sm-2"
                   onChange={(e) => {
-                    handleProductSuppliers(index, "timeSlot", e.target.value);
+                    handleProductSuppliers(index, "time", e.target.value);
                   }}
-                  value={supplierData.timeSlot}
+                  value={supplierData.time}
                 >
                   {Array.from({ length: (24 * 60) / 15 }, (_, index) => {
                     const totalMinutes = index * 15;
@@ -91,7 +77,7 @@ function SupplierDetails({
                 </select>
                 <select
                   className="form-control"
-                  value={supplierData.supplierId}
+                  value={supplierData.supplierId ?? ""}
                   onChange={(e) =>
                     handleProductSuppliers(index, "supplierId", e.target.value)
                   }
@@ -106,19 +92,13 @@ function SupplierDetails({
                 <button
                   className="bg-transparent border-0"
                   type="button"
-                  onClick={() => {
-                    const trustSuppliers = suppliers.map((supplierData, i) => {
-                      if (activeTab === i)
-                        return {
-                          ...supplierData,
-                          contacts: supplierData.contacts.filter(
-                            (_, ind: number) => index !== ind
-                          ),
-                        };
-                      else return supplierData;
-                    });
-                    handleProduct("suppliers", trustSuppliers);
-                  }}
+                  onClick={() =>
+                    handleTours(
+                      activeTab,
+                      "suppliers",
+                      suppliers.filter((_, i: number) => index !== i)
+                    )
+                  }
                 >
                   <Trash2 color={"#dc3545"} size={20} />
                 </button>
@@ -127,19 +107,12 @@ function SupplierDetails({
           <button
             type="button"
             className="btn btn-outline-primary"
-            onClick={() => {
-              const trustSuppliers = suppliers.map((supplierData, index) => {
-                if (activeTab === index)
-                  return {
-                    ...supplierData,
-                    contacts: supplierData.contacts.concat([
-                      { supplierId: "", timeSlot: "" },
-                    ]),
-                  };
-                else return supplierData;
-              });
-              handleProduct("suppliers", trustSuppliers);
-            }}
+            onClick={() =>
+              handleTours(activeTab, "suppliers", [
+                ...suppliers,
+                { supplierId: "", time: "" },
+              ])
+            }
           >
             Add
           </button>

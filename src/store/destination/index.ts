@@ -82,7 +82,7 @@ const DestinationsReducers = createSlice({
         state.loading = true;
       })
       .addCase(getDestinationsAction.fulfilled, (state, action) => {
-        state.destinations = action.payload;
+        state.destinations = action.payload.data;
         state.loading = false;
       })
       .addCase(getDestinationsAction.rejected, (state) => {
@@ -92,7 +92,7 @@ const DestinationsReducers = createSlice({
         state.loading = true;
       })
       .addCase(getDestinationIdAction.fulfilled, (state, action) => {
-        state.destination = action.payload;
+        state.destination = action.payload.data;
         state.loading = false;
       })
       .addCase(getDestinationIdAction.rejected, (state) => {
@@ -102,7 +102,7 @@ const DestinationsReducers = createSlice({
         state.loading = true;
       })
       .addCase(getDestinationTitlesAction.fulfilled, (state, action) => {
-        state.destinationsTitles = action.payload;
+        state.destinationsTitles = action.payload.data;
         state.loading = false;
       })
       .addCase(getDestinationTitlesAction.rejected, (state) => {

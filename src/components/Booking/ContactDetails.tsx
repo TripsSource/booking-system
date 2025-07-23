@@ -2,9 +2,10 @@ import React from "react";
 import PhoneInput from "react-phone-input-2";
 import Select from "react-select";
 import { languages } from "country-data";
-import { BookingFormState, TravellerState } from "@/types/app/booking";
+import { TravellerState } from "@/types/app/booking";
 import moment from "moment";
 import CustomDatePicker from "@/Common/CustomDatePicker";
+import { BookingType } from "@/types/store/booking";
 
 const ContactDetails = ({
   mainTraveller,
@@ -13,7 +14,7 @@ const ContactDetails = ({
 }: {
   mainTraveller: TravellerState;
   updateNestedBookingDetails: (
-    type: keyof BookingFormState["bookingDetails"],
+    type: keyof BookingType,
     key: string,
     value: string | boolean | undefined
   ) => void;

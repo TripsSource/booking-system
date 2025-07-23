@@ -21,3 +21,28 @@ export interface supplierInvoice {
   amount: string;
   vatAmount: number | string;
 }
+
+export interface companyState {
+  name: string;
+  registNumber: string;
+  deputyName: string;
+  workNumber: string;
+  taxCode: string;
+  paymentMethod: string;
+  emailTemplate: string;
+  others: string;
+}
+
+export interface insurancesState {
+  rate: string;
+  contribution: string;
+  benefitRate: string;
+  insuranceRate: string;
+  accidentRate: string;
+  dailyRate: string;
+}
+
+export interface companyDataState {
+  company: companyState;
+  insurances: insurancesState;
+}

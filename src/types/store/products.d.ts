@@ -10,17 +10,17 @@ export interface initialStateType {
 export interface readProductState {
   _id: string;
   name: string;
-  description: string;
+  shortDescription: string;
   destination: string;
   totalIndividualPrices: {
     startingLocationId: string;
     totalIndividualPrice: number;
   }[];
-  options?: number;
-  availableDate?: string;
-  liveStatus: boolean;
+  tours: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
   image: string;
-  isPrivate: boolean;
   maxPrice: number;
   minPrice: number;
   minCost: number;

@@ -128,8 +128,7 @@ function StripeCheckout({
     },
   };
   const { name } = product;
-  const { adultCount, childCount, infantCount, promoPercent } =
-    booking.bookingDetails;
+  const { adultCount, childCount, infantCount, promoPercent } = booking;
   const {
     totalPrice,
     adultPrice,
@@ -139,9 +138,7 @@ function StripeCheckout({
     travelPercent,
     feePercent,
   } = price;
-
-  const decimalTwoPlace = (val: number) => Math.ceil(val * 100) / 100;
-  const totalFee = feePercent + travelPercent;
+  const convertTwoDecimal = (value: number) => Math.round(value * 100) / 100;
   return (
     <>
       {clientSecret ? (
@@ -151,7 +148,7 @@ function StripeCheckout({
               <div className="pricing-container">
                 <div className="pricing-header">
                   <h6 style={{ color: "grey" }}>{name}</h6>
-                  <h3 className="price">CHF {totalPrice.toFixed(2)}</h3>
+                  <h3 className="price">CHF {convertTwoDecimal(totalPrice)}</h3>
                 </div>
 
                 <div className="pricing-details">
@@ -165,8 +162,10 @@ function StripeCheckout({
                       <span style={{ flex: "1 1 auto" }}></span>
                       <span style={{ fontWeight: "bold" }}>
                         CHF{" "}
-                        {(adultPrice * (1 - promoPercent - totalFee)).toFixed(
-                          2
+                        {convertTwoDecimal(
+                          adultPrice *
+                            (1 - feePercent - travelPercent) *
+                            (1 - promoPercent)
                         )}
                       </span>
                     </div>
@@ -181,8 +180,10 @@ function StripeCheckout({
                       <span style={{ flex: "1 1 auto" }}></span>
                       <span style={{ fontWeight: "bold" }}>
                         CHF{" "}
-                        {(childPrice * (1 - promoPercent - totalFee)).toFixed(
-                          2
+                        {convertTwoDecimal(
+                          childPrice *
+                            (1 - feePercent - travelPercent) *
+                            (1 - promoPercent)
                         )}
                       </span>
                     </div>
@@ -206,7 +207,7 @@ function StripeCheckout({
                     </div>
                     <span style={{ flex: "1 1 auto" }}></span>
                     <span style={{ fontWeight: "bold" }}>
-                      CHF {fee.toFixed(2)}
+                      CHF {convertTwoDecimal(fee)}
                     </span>
                   </div>
                   {travelPercent > 0 && (
@@ -218,7 +219,7 @@ function StripeCheckout({
                       </div>
                       <span style={{ flex: "1 1 auto" }}></span>
                       <span style={{ fontWeight: "bold" }}>
-                        CHF {travelFee.toFixed(2)}
+                        CHF {convertTwoDecimal(travelFee)}
                       </span>
                     </div>
                   )}
@@ -228,7 +229,7 @@ function StripeCheckout({
                       <span style={{ fontWeight: "bold" }}>Subtotal</span>
                       <span style={{ flex: "1 1 auto" }}></span>
                       <span style={{ fontWeight: "bold" }}>
-                        CHF {totalPrice.toFixed(2)}
+                        CHF {convertTwoDecimal(totalPrice)}
                       </span>
                     </div>
                   </div>

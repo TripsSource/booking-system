@@ -9,7 +9,8 @@ const DestinationDetail = ({
 }: DestinationDetailProps) => {
   const {
     destinationTitle,
-    generalDescription,
+    description,
+    shortDescription,
     currentImages,
     deletedImages = [],
     images,
@@ -38,19 +39,30 @@ const DestinationDetail = ({
       <div className="card-body b-light rounded mb-3">
         <div className="mb-3">
           <label className="form-label-title">Title</label>
-          <select
-            className="form-control js-example-basic-single col-sm-12"
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Enter your destination’s title."
             value={destinationTitle}
             onChange={(e) =>
               handleDistination("destinationTitle", e.target.value)
             }
-          >
-            {TOUR_CITIES.map((value: { id: string; city: string }) => (
-              <option key={value.id} value={value.city}>
-                {value.city}
-              </option>
-            ))}
-          </select>
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label-title">Short Description</label>
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Briefly describe this tour—keep it to around 100 characters."
+            value={shortDescription}
+            onChange={(e) =>
+              handleDistination(
+                "shortDescription",
+                e.target.value.slice(0, 100)
+              )
+            }
+          />
         </div>
         <div className="mb-3">
           <label className="form-label-title">Description</label>
@@ -58,10 +70,8 @@ const DestinationDetail = ({
             className="form-control"
             placeholder="Provide the rundown description..."
             id="floatingTextarea"
-            value={generalDescription}
-            onChange={(e) =>
-              handleDistination("generalDescription", e.target.value)
-            }
+            value={description}
+            onChange={(e) => handleDistination("description", e.target.value)}
           />
         </div>
 

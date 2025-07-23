@@ -41,12 +41,6 @@ export const MENUITEMS: MenuItem[] = [
     ],
   },
   {
-    title: "Tour Area",
-    icon: "Target",
-    type: "sub",
-    menu: [{ url: "/tours/view", title: "Available Tours", type: "link" }],
-  },
-  {
     title: "Booking Area",
     icon: "Briefcase",
     type: "sub",

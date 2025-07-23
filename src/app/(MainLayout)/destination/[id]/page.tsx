@@ -11,32 +11,41 @@ import {
   destinationLoadingState,
   updateDestinationAction,
 } from "@/store/destination";
-import { TOUR_CITIES } from "@/constants/data";
 import { useParams } from "next/navigation";
 import PageLoader from "@/layouts/PageLoader";
-import LoadingButton from "@/Common/LoadingButton";
 import RoleProvider from "@/providers/RoleProvider";
+import isEqual from "lodash/isEqual";
+import LoadingAuthButton from "@/Common/LoadingAuthButton";
 
-const ReadIdDestination = () => {
+const page = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams();
   const loading = useSelector(destinationLoadingState);
   const initialDestination: DestinationDetailState = {
-    destinationTitle: TOUR_CITIES[0].city,
-    generalDescription: "",
+    destinationTitle: "",
+    description: "",
+    shortDescription: "",
     images: [],
   };
   const [destination, setDestination] =
     useState<DestinationDetailState>(initialDestination);
 
+  const [updateForm, setUpdateForm] =
+    useState<DestinationDetailState>(initialDestination);
+
   const getIdDestination = async () => {
     const { payload } = await dispatch(getDestinationIdAction(`${id}`));
-    if (payload.error) {
+    if (payload?.["error"]) {
       toast.error(`${payload.error}`);
     } else {
       setDestination({
-        ...payload,
-        currentImages: payload.images,
+        ...payload.data,
+        currentImages: payload.data.images,
+        images: [],
+      });
+      setUpdateForm({
+        ...payload.data,
+        currentImages: payload.data.images,
         images: [],
       });
     }
@@ -53,23 +62,23 @@ const ReadIdDestination = () => {
     setDestination((pre) => ({ ...pre, [params]: value }));
   };
 
-  const saveProduct = async () => {
+  const saveDestination = async () => {
     if (id) {
       const { payload } = await dispatch(updateDestinationAction(destination));
-      if (payload && "error" in payload && payload.error) {
+      if (payload?.["error"]) {
         toast.error(payload.error);
       } else {
-        if (payload && "message" in payload) {
+        if (payload?.["message"]) {
           toast.success(payload.message);
           getIdDestination();
         }
       }
     } else {
       const { payload } = await dispatch(crateDestinationAction(destination));
-      if (payload && "error" in payload && payload.error) {
+      if (payload?.["error"]) {
         toast.error(payload.error);
       } else {
-        if (payload && "message" in payload) {
+        if (payload?.["message"]) {
           toast.success(payload.message);
           setDestination(initialDestination);
         }
@@ -86,12 +95,13 @@ const ReadIdDestination = () => {
               <div className="card-header d-flex justify-content-between">
                 <h3>Update a destination</h3>
                 <div className="mb-5 justify-content-end d-flex m-l-50">
-                  <LoadingButton
+                  <LoadingAuthButton
                     {...{
                       loading,
-                      func: saveProduct,
+                      onFunc: saveDestination,
                       title: "Update Destination",
                       classes: "btn btn-primary btn-block w-10",
+                      disabled: isEqual(destination, updateForm),
                     }}
                   />
                 </div>
@@ -110,4 +120,4 @@ const ReadIdDestination = () => {
   );
 };
 
-export default ReadIdDestination;
+export default page;

@@ -31,9 +31,7 @@ export const getBookings = async (pages: { page: number; perPage: number }) => {
 };
 
 export const getBookingById = async (id: string) => {
-  return await api
-    .get<Response<BookingType>>(`/api/bookings/${id}`)
-    .then((res) => res.data);
+  return await api.get(`/api/bookings/${id}`).then((res) => res.data);
 };
 
 export const updateBooking = async (

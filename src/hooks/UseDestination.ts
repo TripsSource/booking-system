@@ -13,11 +13,12 @@ import { toast } from "react-toastify";
 export const useGetAllDestinations = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [status, setStatus] = useState<boolean>(false);
-  const func = async () => {
-    await dispatch(getDestinationsAction({}));
+  const fetchData = async () => {
+    const { payload } = await dispatch(getDestinationsAction({}));
+    console.log(payload);
   };
   useEffect(() => {
-    func();
+    fetchData();
   }, [status]);
   const allDestinations: readDestinationType[] = useSelector(destinationsState);
   const loading = useSelector(destinationLoadingState);
@@ -27,7 +28,7 @@ export const useGetAllDestinations = () => {
 export const useDeleteIdDestination = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [id, setId] = useState<string>("");
-  const func = async () => {
+  const fetchData = async () => {
     const { payload } = await dispatch(deleteDestinationAction(id));
     if (payload && "error" in payload && payload.error) {
       toast.error(payload.error);
@@ -40,7 +41,7 @@ export const useDeleteIdDestination = () => {
   };
   useEffect(() => {
     if (id !== "") {
-      func();
+      fetchData();
     }
   }, [id]);
   const loading = useSelector(destinationLoadingState);

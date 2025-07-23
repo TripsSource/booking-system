@@ -3,36 +3,37 @@ import { CostDetailsProps } from "@/types/components/product";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
-  const { startingLocations, revenues } = product;
+const CostDetails = ({ product, handleTours }: CostDetailsProps) => {
+  const { tours } = product;
   const destinations = useSelector(destinationTitlesState);
-  const tabs = startingLocations.map(
-    (item) =>
-      destinations.find((item2) => item2._id === item._id)?.destinationTitle
+  const tabs = tours.map(
+    (tour) =>
+      destinations.find((destination) => destination._id === tour.destinationId)
+        ?.destinationTitle
   );
   const [activeTab, setActiveTab] = useState(0);
 
-  const handleProductCosts = (param: string, value: string) => {
-    const newRevenues = revenues.map((revenue, index) => {
-      if (activeTab === index)
-        return { ...revenues[activeTab], [param]: value };
-      else return revenue;
+  const handleRevenue = (type: string, value: string) => {
+    handleTours(activeTab, "revenue", {
+      ...tours[activeTab].revenue,
+      [type]: value,
     });
-    handleProduct("revenues", newRevenues);
   };
 
+  const selectedRevenue = tours[activeTab]?.revenue;
+
   const totalIndividual =
-    Number(revenues[activeTab]?.boatTicket) +
-    Number(revenues[activeTab]?.clientTrainTicket) +
-    Number(revenues[activeTab]?.mountainTicket1) +
-    Number(revenues[activeTab]?.mountainTicket2) +
-    Number(revenues[activeTab]?.swissHalfFareTravelPass) +
-    Number(revenues[activeTab]?.tasting1) +
-    Number(revenues[activeTab]?.tasting2) +
-    Number(revenues[activeTab]?.tasting3);
+    Number(selectedRevenue.boatTicket) +
+    Number(selectedRevenue.clientTrainTicket) +
+    Number(selectedRevenue.mountainTicket1) +
+    Number(selectedRevenue.mountainTicket2) +
+    Number(selectedRevenue.swissHalfFareTravelPass) +
+    Number(selectedRevenue.tasting1) +
+    Number(selectedRevenue.tasting2) +
+    Number(selectedRevenue.tasting3);
   const totalBulk =
-    Number(revenues[activeTab]?.guideTrainTicket) +
-    Number(revenues[activeTab]?.transportation);
+    Number(selectedRevenue.guideTrainTicket) +
+    Number(selectedRevenue.transportation);
   return (
     <div>
       <ul className="nav nav-tabs mb-3">
@@ -46,7 +47,7 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
               href="#"
               onClick={() => setActiveTab(index)}
             >
-              {tab}
+              Tour{index + 1} - {tab}
             </a>
           </li>
         ))}
@@ -67,11 +68,11 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].clientTrainTicket}
+                    value={selectedRevenue.clientTrainTicket}
                     placeholder="Enter amount"
                     className="form-control"
                     onChange={(e) =>
-                      handleProductCosts("clientTrainTicket", e.target.value)
+                      handleRevenue("clientTrainTicket", e.target.value)
                     }
                   />
                 </div>
@@ -82,14 +83,11 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].swissHalfFareTravelPass}
+                    value={selectedRevenue.swissHalfFareTravelPass}
                     placeholder="Enter amount"
                     className="form-control"
                     onChange={(e) =>
-                      handleProductCosts(
-                        "swissHalfFareTravelPass",
-                        e.target.value
-                      )
+                      handleRevenue("swissHalfFareTravelPass", e.target.value)
                     }
                   />
                 </div>
@@ -105,8 +103,8 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                 placeholder="Calculated automatically"
                 className="form-control"
                 value={`${
-                  Number(revenues[activeTab].clientTrainTicket) +
-                  Number(revenues[activeTab].swissHalfFareTravelPass)
+                  Number(selectedRevenue.clientTrainTicket) +
+                  Number(selectedRevenue.swissHalfFareTravelPass)
                 }`}
                 readOnly
               />
@@ -128,9 +126,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].mountainTicket1}
+                    value={selectedRevenue.mountainTicket1}
                     onChange={(e) =>
-                      handleProductCosts("mountainTicket1", e.target.value)
+                      handleRevenue("mountainTicket1", e.target.value)
                     }
                     placeholder="Enter amount"
                     className="form-control"
@@ -143,9 +141,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].mountainTicket2}
+                    value={selectedRevenue.mountainTicket2}
                     onChange={(e) =>
-                      handleProductCosts("mountainTicket2", e.target.value)
+                      handleRevenue("mountainTicket2", e.target.value)
                     }
                     placeholder="Enter amount"
                     className="form-control"
@@ -156,9 +154,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].boatTicket}
+                    value={selectedRevenue.boatTicket}
                     onChange={(e) =>
-                      handleProductCosts("boatTicket", e.target.value)
+                      handleRevenue("boatTicket", e.target.value)
                     }
                     placeholder="Enter amount"
                     className="form-control"
@@ -174,9 +172,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                 type="number"
                 min={0}
                 value={`${
-                  Number(revenues[activeTab].mountainTicket1) +
-                  Number(revenues[activeTab].mountainTicket2) +
-                  Number(revenues[activeTab].boatTicket)
+                  Number(selectedRevenue.mountainTicket1) +
+                  Number(selectedRevenue.mountainTicket2) +
+                  Number(selectedRevenue.boatTicket)
                 }`}
                 placeholder="Calculated automatically"
                 className="form-control"
@@ -198,12 +196,10 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     min={0}
                     type="number"
-                    value={revenues[activeTab].tasting1}
+                    value={selectedRevenue.tasting1}
                     className="form-control"
                     placeholder="Enter amount"
-                    onChange={(e) =>
-                      handleProductCosts("tasting1", e.target.value)
-                    }
+                    onChange={(e) => handleRevenue("tasting1", e.target.value)}
                   />
                 </div>
                 <div className="col-sm-4">
@@ -211,12 +207,10 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     min={0}
                     type="number"
-                    value={revenues[activeTab].tasting2}
+                    value={selectedRevenue.tasting2}
                     className="form-control"
                     placeholder="Enter amount"
-                    onChange={(e) =>
-                      handleProductCosts("tasting2", e.target.value)
-                    }
+                    onChange={(e) => handleRevenue("tasting2", e.target.value)}
                   />
                 </div>
                 <div className="col-sm-4">
@@ -224,12 +218,10 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     min={0}
                     type="number"
-                    value={revenues[activeTab].tasting3}
+                    value={selectedRevenue.tasting3}
                     className="form-control"
                     placeholder="Enter amount"
-                    onChange={(e) =>
-                      handleProductCosts("tasting3", e.target.value)
-                    }
+                    onChange={(e) => handleRevenue("tasting3", e.target.value)}
                   />
                 </div>
               </div>
@@ -242,9 +234,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                 type="number"
                 min={0}
                 value={`${
-                  Number(revenues[activeTab].tasting1) +
-                  Number(revenues[activeTab].tasting2) +
-                  Number(revenues[activeTab].tasting3)
+                  Number(selectedRevenue.tasting1) +
+                  Number(selectedRevenue.tasting2) +
+                  Number(selectedRevenue.tasting3)
                 }`}
                 placeholder="Calculated automatically"
                 className="form-control"
@@ -268,9 +260,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].guideTrainTicket}
+                    value={selectedRevenue.guideTrainTicket}
                     onChange={(e) =>
-                      handleProductCosts("guideTrainTicket", e.target.value)
+                      handleRevenue("guideTrainTicket", e.target.value)
                     }
                     placeholder="Enter amount"
                     className="form-control"
@@ -283,9 +275,9 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                   <input
                     type="number"
                     min={0}
-                    value={revenues[activeTab].transportation}
+                    value={selectedRevenue.transportation}
                     onChange={(e) =>
-                      handleProductCosts("transportation", e.target.value)
+                      handleRevenue("transportation", e.target.value)
                     }
                     placeholder="Enter amount"
                     className="form-control"
@@ -301,8 +293,8 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
                 type="number"
                 min={0}
                 value={`${
-                  Number(revenues[activeTab].guideTrainTicket) +
-                  Number(revenues[activeTab].transportation)
+                  Number(selectedRevenue.guideTrainTicket) +
+                  Number(selectedRevenue.transportation)
                 }`}
                 placeholder="Calculated automatically"
                 className="form-control"
@@ -354,10 +346,8 @@ const CostDetails = ({ product, handleProduct }: CostDetailsProps) => {
               <input
                 type="number"
                 min={0}
-                value={revenues[activeTab].childrenCost}
-                onChange={(e) =>
-                  handleProductCosts("childrenCost", e.target.value)
-                }
+                value={selectedRevenue.childrenCost}
+                onChange={(e) => handleRevenue("childrenCost", e.target.value)}
                 placeholder="Enter amount"
                 className="form-control"
               />

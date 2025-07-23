@@ -5,8 +5,7 @@ import { ContentWriterAreaProps } from "@/types/components/product";
 
 const ContentWriterArea = ({ product }: ContentWriterAreaProps) => {
   const destinations = useSelector(destinationTitlesState);
-  const { name, description, destination, startingLocations, isPrivate } =
-    product;
+  const { name, shortDescription, description, destinationId, tours } = product;
   return (
     <form className="theme-form mega-form">
       <div className="mb-3">
@@ -33,12 +32,26 @@ const ContentWriterArea = ({ product }: ContentWriterAreaProps) => {
               placeholder="Enter Destination"
               className="form-control"
               value={
-                destinations.find((value) => value._id === destination)
+                destinations.find((value) => value._id === destinationId)
                   ?.destinationTitle
               }
               readOnly
             />
           </div>
+        </div>
+        <div className="mb-3">
+          <label className="form-label-title ">Short Description</label>
+          <textarea
+            className="form-control"
+            placeholder="Provide the rundown description..."
+            id="floatingTextarea"
+            value={
+              shortDescription
+                ? shortDescription
+                : "No description provided for this rundown"
+            }
+            readOnly
+          />
         </div>
         <div className="mb-3">
           <label className="form-label-title ">Description</label>
@@ -55,7 +68,7 @@ const ContentWriterArea = ({ product }: ContentWriterAreaProps) => {
           />
         </div>
         <div className="mb-3">
-          {startingLocations.map((location, index) => (
+          {tours.map((tour, index) => (
             <div className="row g-3 mb-3 d-flex align-items-end" key={index}>
               <div className="col-sm-4">
                 {index === 0 && (
@@ -65,8 +78,9 @@ const ContentWriterArea = ({ product }: ContentWriterAreaProps) => {
                   type="text"
                   className="form-control"
                   value={
-                    destinations.find((value) => value._id === location._id)
-                      ?.destinationTitle
+                    destinations.find(
+                      (value) => value._id === tour.destinationId
+                    )?.destinationTitle
                   }
                   readOnly
                 />
@@ -80,9 +94,9 @@ const ContentWriterArea = ({ product }: ContentWriterAreaProps) => {
                   placeholder="Enter a meeting location"
                   className="form-control"
                   value={
-                    isPrivate
+                    tour.isPrivate
                       ? "Provided by customer"
-                      : location.meetingLocation
+                      : tour.meetingLocation ?? ""
                   }
                   readOnly
                 />
@@ -95,9 +109,7 @@ const ContentWriterArea = ({ product }: ContentWriterAreaProps) => {
                   type="number"
                   placeholder="Enter a duration hours"
                   className="form-control"
-                  value={
-                    isPrivate ? "Provided by customer" : location.durationHours
-                  }
+                  value={tour.duration}
                   readOnly
                 />
               </div>

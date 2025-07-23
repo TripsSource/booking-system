@@ -9,7 +9,6 @@ import {
   crateDestinationAction,
   destinationLoadingState,
 } from "@/store/destination";
-import { TOUR_CITIES } from "@/constants/data";
 import PageLoader from "@/layouts/PageLoader";
 import LoadingButton from "@/Common/LoadingButton";
 import RoleProvider from "@/providers/RoleProvider";
@@ -18,8 +17,9 @@ const CreateDestination = () => {
   const dispatch = useDispatch<AppDispatch>();
   const loading = useSelector(destinationLoadingState);
   const initialDestination: DestinationDetailState = {
-    destinationTitle: TOUR_CITIES[0].city,
-    generalDescription: "",
+    destinationTitle: "",
+    description: "",
+    shortDescription: "",
     images: [],
   };
 
@@ -33,11 +33,14 @@ const CreateDestination = () => {
     setDestination((pre) => ({ ...pre, [params]: value }));
   };
 
-  const saveProduct = async () => {
+  const saveDestination = async () => {
     if (destination.destinationTitle === "") {
       toast.error("Please select a destination title");
       return;
-    } else if (destination.generalDescription.trim() === "") {
+    } else if (destination.shortDescription.trim() === "") {
+      toast.error("Please provide a general description");
+      return;
+    } else if (destination.description.trim() === "") {
       toast.error("Please provide a general description");
       return;
     }
@@ -65,7 +68,7 @@ const CreateDestination = () => {
                   <LoadingButton
                     {...{
                       loading,
-                      func: saveProduct,
+                      func: saveDestination,
                       title: "Add Destination",
                       classes: "btn btn-primary btn-block w-10",
                     }}

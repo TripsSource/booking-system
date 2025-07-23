@@ -19,7 +19,7 @@ const Employment = () => {
           <div className="row mt-1 g-3">
             <div className="col-sm-8">
               <label className="form-label-title">Employment Contract</label>
-              <input type="input" placeholder="" className="form-control" />
+              <input type="text" placeholder="" className="form-control" />
             </div>
             <div className="col-sm-4">
               <label className="form-label-title">Working Type</label>
@@ -60,13 +60,13 @@ const Employment = () => {
           <div className="row mt-1 g-3">
             <div className="col-sm-6">
               <label className="form-label-title">Employee Number</label>
-              <input type="input" placeholder="" className="form-control" />
+              <input type="text" placeholder="" className="form-control" />
             </div>
             <div className="col-sm-6">
               <label className="form-label-title">
                 Effective Vacation Days
               </label>
-              <input type="input" placeholder="" className="form-control" />
+              <input type="text" placeholder="" className="form-control" />
             </div>
           </div>
           <div className="row mt-1 g-3">

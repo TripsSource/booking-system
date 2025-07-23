@@ -22,11 +22,11 @@ function OtaBookings({
   const otaLoading = useSelector(bookingsLoadingState);
   const otaBookingTitles = [
     { label: "Booking Date", value: "bookingDateObj" },
-    { label: "Tour Name", value: "productInfo.name" },
-    { label: "Tour Type", value: "productInfo.isPrivate" },
+    { label: "Tour Name", value: "productId.name" },
+    { label: "Tour Type", value: "tourId.isPrivate" },
     { label: "Name", value: "mainTraveller.firstname" },
     { label: "Email", value: "mainTraveller.email" },
-    { label: "PAX", value: "totalParticipants" },
+    { label: "PAX", value: "" },
     { label: "Price(CHF)", value: "amount" },
     { label: "Status", value: "status" },
   ];

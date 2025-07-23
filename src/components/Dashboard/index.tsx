@@ -13,37 +13,37 @@ import { useEffect, useState } from "react";
 
 const DashboardContainer: React.FC = () => {
   const [embedUrl, setEmbedUrl] = useState("");
-  const getChat = async () => {
-    await api.get("/api/dash/").then((res) => {
-      setEmbedUrl(res.data);
-    });
-  };
-  useEffect(() => {
-    getChat();
-  }, []);
+  // const getChat = async () => {
+  //   await api.get("/api/dash/").then((res) => {
+  //     setEmbedUrl(res.data);
+  //   });
+  // };
+  // useEffect(() => {
+  //   getChat();
+  // }, []);
   return (
     <div className="container-fluid">
-      {embedUrl === "" ? (
+      {/* {embedUrl === "" ? (
         <PageLoader />
       ) : (
         <div className="row">
-          {/* <GrowthCard /> */}
           <iframe
             width="100%"
             height="980"
             src={embedUrl} // URL obtained from your backend
             frameBorder="0"
             allowFullScreen
-          ></iframe>
-          {/* <VisitorsChart />
-        <EarningChart />
-        <BookingHistory />
-        <Calender />
-        <TrafficChart /> */}
-          {/* <WorldMap checkPlace={false} /> */}
-          {/* <Tours /> */}
+            ></iframe>
         </div>
-      )}
+      )} */}
+      <GrowthCard />
+      <VisitorsChart />
+      <EarningChart />
+      <BookingHistory />
+      <Calender />
+      <TrafficChart />
+      {/* <WorldMap checkPlace={false} /> */}
+      <Tours />
     </div>
   );
 };

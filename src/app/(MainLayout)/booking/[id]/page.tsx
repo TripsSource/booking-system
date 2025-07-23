@@ -21,7 +21,6 @@ import { marginState } from "@/store/financial";
 
 const page = () => {
   const { id } = useParams();
-
   const {
     isLoading,
     productLoading,
@@ -31,9 +30,6 @@ const page = () => {
     checkout,
     clientSecret,
     step,
-    promo,
-    setPromo,
-    applyPromo,
     setStep,
     onStepClick,
     handleBookingDetails,
@@ -43,15 +39,14 @@ const page = () => {
     handleCheckout,
     isButtonDisabled,
     handleStepAdvance,
+    promo,
+    setPromo,
+    applyPromo,
   } = useAllStatusBooking(id as string, "update");
+  const { tours } = product;
+  const { adultCount, childCount, tourId, promoPercent } = booking;
 
-  const { revenues, startingLocations } = product;
-  const { adultCount, childCount, startingLocationId, promoPercent } =
-    booking.bookingDetails;
-
-  const Cost = revenues?.find(
-    (item) => item.startingLocationId === startingLocationId
-  );
+  const tour = tours?.find((tour) => tour._id === tourId);
 
   const feePercent = 0.03;
   const travelPercent =
@@ -60,14 +55,7 @@ const page = () => {
       : 0;
 
   const margins = useSelector(marginState);
-  const calculateMargin = (startingLocation: string) => {
-    if (!Array.isArray(startingLocations)) {
-      return 0;
-    }
-    const duration = Number(
-      startingLocations.find((location) => location._id === startingLocation)
-        ?.durationHours ?? 0
-    );
+  const calculateMargin = (duration: number) => {
     if (duration >= 1 && duration < 5) {
       return parseFloat(margins.shortMarkup);
     } else if (duration >= 5 && duration < 10) {
@@ -79,13 +67,14 @@ const page = () => {
 
   const adultPrice =
     Number(adultCount) *
-    ((Cost?.totalBulkCost ?? 0) + (Cost?.totalIndividualCost ?? 0)) *
-    calculateMargin(Cost?.startingLocationId ?? "");
+    (Number(tour?.revenue.totalBulkCost ?? 0) +
+      Number(tour?.revenue.totalIndividualCost ?? 0)) *
+    calculateMargin(Number(tour?.duration));
 
   const childPrice =
     Number(childCount) *
-    Number(Cost?.childrenCost) *
-    calculateMargin(Cost?.startingLocationId ?? "");
+    Number(tour?.revenue.childrenCost) *
+    calculateMargin(Number(tour?.duration));
 
   const totalPrice = (adultPrice + childPrice) * (1 - promoPercent);
 
@@ -126,7 +115,7 @@ const page = () => {
                   {step.current === 0 && (
                     <ContactDetails
                       {...{
-                        mainTraveller: booking.bookingDetails.mainTraveller,
+                        mainTraveller: booking.mainTraveller,
                         updateNestedBookingDetails,
                         handleBookingMintraveler,
                       }}
@@ -136,7 +125,7 @@ const page = () => {
                     <TourBooking
                       {...{
                         product,
-                        bookingDetail: booking.bookingDetails,
+                        bookingDetail: booking,
                         handleBookingDetails,
                         updateNestedBookingDetails,
                         updateBookingDetails,

@@ -11,7 +11,8 @@ import { readProductState } from "@/types/store/products";
 const ReadAllProducts = () => {
   const dispatch = useDispatch<AppDispatch>();
   const getProducts = async () => {
-    await dispatch(getProductsAction({}));
+    const { payload } = await dispatch(getProductsAction({}));
+    console.log(payload);
   };
   const [deleted, setDeleted] = useState(false);
   useEffect(() => {

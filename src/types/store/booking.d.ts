@@ -22,28 +22,25 @@ export interface readBookingType {
 
 export interface BookingType {
   _id?: string;
-  bookingDetails: {
-    _id?: string;
-    mainTraveller: TravellerState;
-    questions: Questions;
-    productId: string;
-    startingLocationId: string;
-    meetingLocation: string;
-    adultCount: number;
-    childCount: number;
-    infantCount: number;
-    bookingDate: string;
-    startTime: string;
-    promoCode: string;
-    promoPercent: number;
-    otherTravellers: {
-      firstname: string;
-      lastname: string;
-      birthDate: string;
-    }[];
-    amount: number;
-    isPrivate: boolean;
-  };
+  mainTraveller: TravellerState;
+  questions: Questions;
+  productId: string;
+  tourId: string;
+  meetingLocation: string;
+  adultCount: number;
+  childCount: number;
+  infantCount: number;
+  bookingDate: string;
+  startTime: string;
+  promoCode: string;
+  promoPercent: number;
+  otherTravellers: {
+    firstname: string;
+    lastname: string;
+    birthDate: string;
+  }[];
+  amount: number;
+  isPrivate: boolean;
 }
 
 export interface BookingDetails {

@@ -4,67 +4,43 @@ import React, { useMemo, useState } from "react";
 import { Trash2 } from "react-feather";
 import { useSelector } from "react-redux";
 
-const GuideDetails = ({ product, handleProduct }: GuideDetailsProps) => {
-  const { startingLocations, guideDetails, timeSlots, isPrivate } = product;
-  const useTimeSlots = useMemo(() => timeSlots.times, [timeSlots.times]);
+const GuideDetails = ({ product, handleTours }: GuideDetailsProps) => {
+  const { tours } = product;
   const destinations = useSelector(destinationTitlesState);
-  const tabs = startingLocations.map(
-    (item) =>
-      destinations.find((item2) => item2._id === item._id)?.destinationTitle
+  const tabs = tours.map(
+    (tour) =>
+      destinations.find((destination) => destination._id === tour.destinationId)
+        ?.destinationTitle
   );
   const [activeTab, setActiveTab] = useState(0);
 
-  const handleProductStops = (ind: number, param: string, value: string) => {
+  const { guideDetails, times, duration, isPrivate, meetingLocation } =
+    tours[activeTab];
+  const handleProductStops = (i: number, type: string, value: string) => {
     const newGuide = guideDetails.map((guideDetail, index) => {
-      if (activeTab === index)
+      if (i === index)
         return {
-          ...guideDetails[activeTab],
-          itineraryStops: guideDetails[activeTab].itineraryStops.map(
-            (stop, i) => {
-              if (ind === i) {
-                return {
-                  ...stop,
-                  [param]: value,
-                };
-              } else return stop;
-            }
-          ),
+          ...guideDetail,
+          [type]: value,
         };
       else return guideDetail;
     });
-    handleProduct("guideDetails", newGuide);
+    handleTours(activeTab, "guideDetails", newGuide);
   };
 
   const RemoveProductStops = (i: number) => {
-    const newGuide = guideDetails.map((guideDetail, index) => {
-      if (activeTab === index)
-        return {
-          ...guideDetails[activeTab],
-          itineraryStops: guideDetails[activeTab].itineraryStops.filter(
-            (_, ind) => i !== ind
-          ),
-        };
-      else return guideDetail;
-    });
-    handleProduct("guideDetails", newGuide);
+    handleTours(
+      activeTab,
+      "guideDetails",
+      guideDetails.filter((_, index) => i !== index)
+    );
   };
 
   const AddProductStops = () => {
-    const newGuide = guideDetails.map((guideDetail, index) => {
-      if (activeTab === index)
-        return {
-          ...guideDetails[activeTab],
-          itineraryStops: [
-            ...guideDetails[activeTab].itineraryStops,
-            {
-              position: "",
-              pointsToCover: "",
-            },
-          ],
-        };
-      else return guideDetail;
-    });
-    handleProduct("guideDetails", newGuide);
+    handleTours(activeTab, "guideDetails", [
+      ...guideDetails,
+      { position: "", pointsToCover: "" },
+    ]);
   };
 
   const convertEndDate = (startTime: string, duration: string) => {
@@ -107,7 +83,7 @@ const GuideDetails = ({ product, handleProduct }: GuideDetailsProps) => {
               <label className="form-label-title">Duration</label>
             </div>
           </div>
-          {useTimeSlots.map((time, index) => (
+          {times.map((time, index) => (
             <div className="row mb-2" key={index}>
               <div className="col-sm-4">
                 <input
@@ -121,17 +97,14 @@ const GuideDetails = ({ product, handleProduct }: GuideDetailsProps) => {
                 <input
                   type="text"
                   className="form-control"
-                  value={convertEndDate(
-                    time,
-                    startingLocations[activeTab].durationHours
-                  )}
+                  value={convertEndDate(time, duration.toString())}
                   disabled={isPrivate}
                 />
               </div>
               <div className="col-sm-4">
                 <input
                   type="text"
-                  value={startingLocations[activeTab].durationHours}
+                  value={duration}
                   className="form-control"
                   readOnly
                   disabled={isPrivate}
@@ -150,8 +123,8 @@ const GuideDetails = ({ product, handleProduct }: GuideDetailsProps) => {
               className="form-control"
               value={
                 isPrivate
-                  ? ""
-                  : startingLocations[activeTab]?.meetingLocation || ""
+                  ? "customer input for meeting location"
+                  : meetingLocation ?? "Didn't input meetingLocation"
               }
               readOnly
               disabled={isPrivate}
@@ -159,9 +132,8 @@ const GuideDetails = ({ product, handleProduct }: GuideDetailsProps) => {
           </div>
         </div>
         <div className="mb-4">
-          {guideDetails[activeTab] &&
-            guideDetails[activeTab].itineraryStops &&
-            guideDetails[activeTab].itineraryStops.map((guide, index) => (
+          {guideDetails &&
+            guideDetails.map((guide, index) => (
               <div className="row mb-3">
                 <div className="col-sm-5">
                   <label className="form-label-title">Stop {index + 1}</label>
